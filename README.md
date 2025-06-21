@@ -8,7 +8,11 @@ Plan:
 
 Main
   - Query CorpusManager for jobs
-  - Start processing jobs 
+  - Start processing jobs
+
+DatabaseWrapper
+  - Keep all database -related code in one place to permit database migration depending on need
+  - Start with SQLite? 
    
 CorpusManager
   - Manage a database including:
@@ -36,6 +40,7 @@ ReferenceExtractor
    
 ReferenceClassifier
   - Given a reference text, query available LLM's to classify the reference according to each available REFTAXONOMY to TYPE
+  - Annotate WORKS pdf with the outcome
 
 ReferenceFetcher
   - Given a reference, try to obtain original PDF text and update REFS table
@@ -44,6 +49,9 @@ ReferenceAssessment
   - Given a REFTEXT, REFTYPE and REFS entry with available PDF, query available LLM's on the accuracy of the reference
   - Annotate WORKS pdf with the outcome
   - Update ASSESSMENT entry with results
+
+Statistics
+  - Provide statistics and export CSV results
 
 
 
