@@ -1,0 +1,6 @@
+services:
+  fastapi-test:
+    build:
+      context: ./fastapi-test
+    ports:
+    - "8000:8000"
