@@ -1,6 +1,11 @@
 services:
-  fastapi-test:
+  db:
     build:
-      context: ./fastapi-test
+      context: ./db
     ports:
     - "8000:8000"
+    volumes:
+    - db_data:/var/lib/sqlite
+
+volumes:
+  db_data:
