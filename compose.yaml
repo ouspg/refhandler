@@ -1,9 +1,15 @@
 services:
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+    - "8000:8000"
   db:
     build:
       context: ./db
     ports:
-    - "8000:8000"
+    - "8001:8001"
     volumes:
     - db_data:/var/lib/sqlite
 

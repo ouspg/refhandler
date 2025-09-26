@@ -67,4 +67,4 @@ def handle_last_visit():
 if __name__ == "__main__":
     initialize_db()
     
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
