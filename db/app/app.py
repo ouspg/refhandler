@@ -1,8 +1,11 @@
 import uvicorn
 import json
 import sqlite3
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Form, Request
+
+
+app = FastAPI()
+
 
 ################################
 # Database functions
@@ -11,6 +14,7 @@ DB = "/var/lib/sqlite/test.db"
 
 def execute_query(query: str):
     with sqlite3.connect(DB) as con:
+        print(f"Executing query: [{query}]")
         cur = con.cursor()
         ret = cur.execute(query)
         con.commit()
@@ -19,52 +23,43 @@ def execute_query(query: str):
 
 def initialize_db():
     query = """
-    CREATE TABLE IF NOT EXISTS Visits(
-	visit_time DATETIME NOT NULL
+    CREATE TABLE IF NOT EXISTS Posts(
+	id INTEGER PRIMARY KEY,
+    data TEXT
 	);
     """
+    
+    print("initializing db")
     execute_query(query)
 
-def add_visit():
-    query = """
-    INSERT into Visits VALUES (CURRENT_TIMESTAMP);
+def add_post(text: str):
+    query = f"""
+    INSERT into Posts (data) VALUES ("{text}");
     """
     execute_query(query)
 
-def get_all_visits():
+def get_all_posts():
     query = """
-    SELECT * FROM Visits;
+    SELECT * FROM Posts;
     """
     res = execute_query(query)
     return  json.dumps(res.fetchall())
 
-def get_last_visit():
-    query = """
-    SELECT MAX(Visits.visit_time) FROM Visits;
-    """
-    res = execute_query(query)
-    return  json.dumps({"Last visit": res.fetchall()})
-
 ##########################
 # FastAPI edpoint handlers
 ##########################
-app = FastAPI()
 
-@app.get("/")
-def handle_redirect():
-    return RedirectResponse(url=f"/all_visits", status_code=303)
+@app.get("/get_all_posts")
+def handle_get_all_posts():
+    return get_all_posts()
 
-@app.get("/all_visits")
-def handle_all_visits():
-    add_visit()
-    return get_all_visits()
-
-@app.get("/last_visit")
-def handle_last_visit():
-    add_visit()
-    return get_last_visit()
-
+@app.post("/add_post/")
+async def handle_add_post(request: Request):
+    post = await request.json()
+    text = str(post["db_text"])
+    add_post(text)
+    return get_all_posts()
+    
 if __name__ == "__main__":
     initialize_db()
-    
     uvicorn.run(app, host="0.0.0.0", port=8001)
