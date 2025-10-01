@@ -28,7 +28,9 @@ def serve_upload_page():
     return HTMLResponse(content=data, status_code=200)
 
 @app.post("/upload_pdf")
-def upload_pdf(pdf_file: UploadFile = File(...)):
+async def upload_pdf(pdf_file: UploadFile = File()):
+    contents = await pdf_file.read()
+    print(pdf_file)
     if pdf_file.content_type != "application/pdf":
         return {"error": "Only PDF files are allowed."}
     file_location = os.path.join(UPLOAD_DIR, pdf_file.filename)

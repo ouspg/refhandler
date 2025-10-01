@@ -1,6 +1,6 @@
 import uvicorn
 import requests
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 
@@ -21,6 +21,13 @@ def serve_website():
   <input type="submit" value="Submit">
 </form>
 
+<h2>Upload a PDF file</h2>
+
+<form method=\"post\" action=\"/upload_pdf\" enctype=\"multipart/form-data\">
+  <input type=\"file\" name=\"pdf_file\" accept=\"application/pdf\"><br><br>
+  <input type=\"submit\" value=\"Upload\">
+</form>
+
 </body>
 </html>
     """
@@ -29,8 +36,16 @@ def serve_website():
 
 @app.post("/add_post")
 def add_post_to_database(db_text: str = Form()):
-    res = requests.post("http://db:8001/add_post/", json={"db_text": f"{db_text}"})
+    res = requests.post("http://db:8001/add_post", json={"db_text": f"{db_text}"})
     return res.json()
+
+@app.post("/upload_pdf")
+async def upload_file(pdf_file: UploadFile = File()):
+    files = {
+        'pdf_file': (pdf_file.filename, await pdf_file.read(), pdf_file.content_type)
+    }
+    res = requests.post("http://pdfuploader:8002/upload_pdf", files=files)
+    return "file uploaded"
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

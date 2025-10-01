@@ -53,7 +53,7 @@ def get_all_posts():
 def handle_get_all_posts():
     return get_all_posts()
 
-@app.post("/add_post/")
+@app.post("/add_post")
 async def handle_add_post(request: Request):
     post = await request.json()
     text = str(post["db_text"])
