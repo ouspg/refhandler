@@ -45,7 +45,7 @@ async def upload_file(pdf_file: UploadFile = File()):
         'pdf_file': (pdf_file.filename, await pdf_file.read(), pdf_file.content_type)
     }
     res = requests.post("http://pdfuploader:8002/upload_pdf", files=files)
-    return "file uploaded"
+    return res.json()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
