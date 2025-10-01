@@ -29,7 +29,6 @@ def serve_upload_page():
 
 @app.post("/upload_pdf")
 async def upload_pdf(pdf_file: UploadFile = File()):
-    contents = await pdf_file.read()
     print(pdf_file)
     if pdf_file.content_type != "application/pdf":
         return {"error": "Only PDF files are allowed."}
