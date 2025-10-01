@@ -13,6 +13,8 @@ def serve_website():
 <html>
 <body>
 
+<h1>Test frontend for testing Refhandler backend containers</h1>
+
 <h2>Send text to the database</h2>
 
 <form method="post" action="/add_post">
@@ -23,9 +25,9 @@ def serve_website():
 
 <h2>Upload a PDF file</h2>
 
-<form method=\"post\" action=\"/upload_pdf\" enctype=\"multipart/form-data\">
-  <input type=\"file\" name=\"pdf_file\" accept=\"application/pdf\"><br><br>
-  <input type=\"submit\" value=\"Upload\">
+<form method="post" action="/upload_pdf" enctype="multipart/form-data">
+  <input type="file" name="pdf_file" accept="application/pdf"><br><br>
+  <input type="submit" value="Upload">
 </form>
 
 </body>

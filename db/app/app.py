@@ -58,7 +58,10 @@ async def handle_add_post(request: Request):
     post = await request.json()
     text = str(post["db_text"])
     add_post(text)
-    return get_all_posts()
+    
+    res = {"message": "Post added to database",
+           "Posts table after changes": get_all_posts()}
+    return res
     
 if __name__ == "__main__":
     initialize_db()
