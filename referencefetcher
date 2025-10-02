@@ -1,0 +1,11 @@
+# wake up, invoked by cron
+
+# Evaluate processor load? 
+
+# Fetch list of loaded references that are in the database and have not yet been loaded AND are primary references (referenced directly from thesis, we don't want to iterate though references referenced by references referenced by...!)
+# Limit by load?
+
+# For all references...
+
+# Attempt a number of ways to fetch the reference
+# If unsuccessful, mark the reference as "Please upload yourself"
