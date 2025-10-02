@@ -1,0 +1,10 @@
+# wake up, invoked by cron
+
+# Evaluate processor load? 
+
+# Load citations thatr have not yet been (fully) classified
+# Limit by load?
+
+# For each citation
+# For each available citation classifier that has not yet been done
+# Classify citation and make database entry.
