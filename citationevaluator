@@ -1,0 +1,11 @@
+# wake up, invoked by cron
+
+# Evaluate processor load? 
+
+# Fetch list of citations where the reference text is already available
+# Limit by load?
+
+# For each citation
+# For all LLM's
+# For all prompt questions
+# Ask LLM about the citation with the prompt
