@@ -1,0 +1,17 @@
+
+# wake up, invoked by cron
+
+# Evaluate processor load? 
+
+# Fetch list of loaded PDF's that have been parsed, but citations have not yet been detected 
+# Limit by load?
+
+# For all PDF...
+
+# Fetch raw text from database
+# Fetch references from database
+
+# Extract citations AND for all:
+# 1. make an entry to database 
+
+# Mark this PDF as "citations detected"
