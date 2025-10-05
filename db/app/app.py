@@ -1,53 +1,39 @@
 import uvicorn
 import json
-import sqlite3
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Request
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
+SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgres:5432/refhandler"
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-app = FastAPI()
-
-
-################################
-# Database functions
-################################
-DB = "/var/lib/sqlite/test.db"
-
-def execute_query(query: str):
-    with sqlite3.connect(DB) as con:
-        print(f"Executing query: [{query}]")
-        cur = con.cursor()
-        ret = cur.execute(query)
-        con.commit()
-        
-        return ret
+class Post(Base):
+    __tablename__ = "posts"
+    id = Column(Integer, primary_key=True, index=True)
+    data = Column(String)
 
 def initialize_db():
-    query = """
-    CREATE TABLE IF NOT EXISTS Posts(
-	id INTEGER PRIMARY KEY,
-    data TEXT
-	);
-    """
-    
-    print("initializing db")
-    execute_query(query)
+    Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+initialize_db()
 
 def add_post(text: str):
-    query = f"""
-    INSERT into Posts (data) VALUES ("{text}");
-    """
-    execute_query(query)
+    db = SessionLocal()
+    post = Post(data=text)
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    db.close()
 
 def get_all_posts():
-    query = """
-    SELECT * FROM Posts;
-    """
-    res = execute_query(query)
-    return  json.dumps(res.fetchall())
-
-##########################
-# FastAPI edpoint handlers
-##########################
+    db = SessionLocal()
+    posts = db.query(Post).all()
+    db.close()
+    return json.dumps([{"id": p.id, "data": p.data} for p in posts])
 
 @app.get("/get_all_posts")
 def handle_get_all_posts():

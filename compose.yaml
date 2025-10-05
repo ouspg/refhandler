@@ -8,10 +8,7 @@ services:
   db:
     build:
       context: ./db
-    ports:
-    - "8001:8001"
-    volumes:
-    - db_data:/var/lib/sqlite
+    # Backup-only container, not used as main database
 
   pdfuploader:
     build:
@@ -21,6 +18,19 @@ services:
     volumes:
       - pdf_uploads:/pdf_uploads
 
+  postgres:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: refhandler
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   db_data:
   pdf_uploads:
+  postgres_data:
