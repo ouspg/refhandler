@@ -38,7 +38,7 @@ def serve_website():
 
 @app.post("/add_post")
 def add_post_to_database(db_text: str = Form()):
-    res = requests.post("http://db:8001/add_post", json={"db_text": f"{db_text}"})
+    res = requests.post("http://backend:8001/add_post", json={"db_text": f"{db_text}"})
     return res.json()
 
 @app.post("/upload_pdf")

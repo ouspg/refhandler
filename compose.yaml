@@ -5,9 +5,15 @@ services:
       context: ./frontend
     ports:
     - "8000:8000"
-  db:
+  backend:
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
     build:
-      context: ./db
+      context: ./backend
+    ports:
+    - "8001:8001"
     # Backup-only container, not used as main database
 
   pdfuploader:
@@ -21,6 +27,12 @@ services:
   postgres:
     image: postgres:17
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d refhandler"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -29,6 +41,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    ports:
+      - 8003:8080
 
 volumes:
   db_data:
