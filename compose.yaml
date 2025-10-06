@@ -1,11 +1,11 @@
+# ${XXXXX} means variable XXXXX is stored in the .env file
 services:
-
   frontend:
     build:
       context: ./frontend
     env_file: .env
     ports:
-    - ${FRONTEND_PORT}:8000
+    - ${FRONTEND_PORT}:${FRONTEND_PORT}
   backend:
     restart: always
     depends_on:
@@ -47,11 +47,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/mnt/backups
+    labels:
+      deck-chores.pg-dump.command: sh -c "pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB} | gzip -c > /mnt/backups/postgresp_$(date +%F).sql.gz"
+      deck-chores.pg-dump.interval: daily
 
   adminer:
     image: adminer
@@ -62,7 +65,18 @@ services:
     ports:
       - ${ADMINER_PORT}:8080
 
+  deck-chores:
+    image: ghcr.io/funkyfuture/deck-chores:1
+    deploy:
+      mode: global
+    environment:
+      TIMEZONE: Europe/Helsinki
+      DEFAULT_FLAGS: noservice
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - postgres_backups:/mnt/backups
+
 volumes:
-  db_data:
   pdf_uploads:
   postgres_data:
+  postgres_backups:
