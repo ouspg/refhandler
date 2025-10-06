@@ -53,7 +53,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - postgres_backups:/mnt/backups
     labels:
-      deck-chores.pg-dump.command: sh -c "pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB} | gzip -c > /mnt/backups/postgresp_$(date +%F).sql.gz"
+      deck-chores.pg-dump.command: sh -c "pg_dump -c -U ${POSTGRES_USER} ${POSTGRES_DB} > postgres_$(date +%F).sql"
       deck-chores.pg-dump.interval: daily
 
   adminer:
