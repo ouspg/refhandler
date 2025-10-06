@@ -2,7 +2,11 @@ import uvicorn
 import requests
 from fastapi import FastAPI, Form, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
+from os import environ
 
+FRONTEND_PORT = int(environ.get("FRONTEND_PORT", 'NO FRONTEND_PORT IN ENVIRONMENT'))
+BACKEND_URL = f"http://backend:{environ.get("BACKEND_PORT")}"
+PDFUPLOADER_URL = f"http://pdfuploader:{environ.get("PDFUPLOADER_PORT")}"
 
 app = FastAPI()
 
@@ -38,7 +42,7 @@ def serve_website():
 
 @app.post("/add_post")
 def add_post_to_database(db_text: str = Form()):
-    res = requests.post("http://backend:8001/add_post", json={"db_text": f"{db_text}"})
+    res = requests.post(BACKEND_URL+"/add_post", json={"db_text": f"{db_text}"})
     return res.json()
 
 @app.post("/upload_pdf")
@@ -46,8 +50,8 @@ async def upload_file(pdf_file: UploadFile = File()):
     files = {
         'pdf_file': (pdf_file.filename, await pdf_file.read(), pdf_file.content_type)
     }
-    res = requests.post("http://pdfuploader:8002/upload_pdf", files=files)
+    res = requests.post(PDFUPLOADER_URL+"/upload_pdf", files=files)
     return res.json()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=FRONTEND_PORT)

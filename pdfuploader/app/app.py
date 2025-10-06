@@ -3,6 +3,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import HTMLResponse
 import os
 
+PDFUPLOADER_PORT = int(os.environ.get("PDFUPLOADER_PORT", 'NO PDFUPLOADER_PORT IN ENVIRONMENT'))
 UPLOAD_DIR = "/pdf_uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -38,4 +39,4 @@ async def upload_pdf(pdf_file: UploadFile = File()):
     return {"filename": pdf_file.filename, "message": "PDF uploaded successfully."}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run(app, host="0.0.0.0", port=PDFUPLOADER_PORT)

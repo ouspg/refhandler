@@ -3,8 +3,9 @@ services:
   frontend:
     build:
       context: ./frontend
+    env_file: .env
     ports:
-    - "8000:8000"
+    - ${FRONTEND_PORT}:8000
   backend:
     restart: always
     depends_on:
@@ -12,15 +13,23 @@ services:
         condition: service_healthy
     build:
       context: ./backend
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_SERVER: ${POSTGRES_SERVER}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     ports:
-    - "8001:8001"
+    - ${BACKEND_PORT}:${BACKEND_PORT}
     # Backup-only container, not used as main database
 
   pdfuploader:
     build:
       context: ./pdfuploader
+    env_file: .env
     ports:
-      - "8002:8002"
+      - ${PDFUPLOADER_PORT}:${PDFUPLOADER_PORT}
     volumes:
       - pdf_uploads:/pdf_uploads
 
@@ -28,17 +37,19 @@ services:
     image: postgres:17
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d refhandler"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 10s
+    env_file: .env
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: refhandler
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -49,7 +60,7 @@ services:
         condition: service_healthy
     restart: always
     ports:
-      - 8003:8080
+      - ${ADMINER_PORT}:8080
 
 volumes:
   db_data:
