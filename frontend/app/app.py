@@ -6,7 +6,6 @@ from os import environ
 
 FRONTEND_PORT = int(environ.get("FRONTEND_PORT", 'NO FRONTEND_PORT IN ENVIRONMENT'))
 BACKEND_URL = f"http://backend:{environ.get("BACKEND_PORT")}"
-PDFUPLOADER_URL = f"http://pdfuploader:{environ.get("PDFUPLOADER_PORT")}"
 
 app = FastAPI()
 
@@ -50,7 +49,7 @@ async def upload_file(pdf_file: UploadFile = File()):
     files = {
         'pdf_file': (pdf_file.filename, await pdf_file.read(), pdf_file.content_type)
     }
-    res = requests.post(PDFUPLOADER_URL+"/upload_pdf", files=files)
+    res = requests.post(BACKEND_URL+"/upload_pdf", files=files)
     return res.json()
 
 if __name__ == "__main__":
