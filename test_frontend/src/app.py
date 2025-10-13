@@ -1,7 +1,7 @@
 import uvicorn
 import requests
 from fastapi import FastAPI, Form, File, UploadFile
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from os import environ
 
 TEST_FRONTEND_PORT = int(environ.get("TEST_FRONTEND_PORT", 'NO TEST_FRONTEND_PORT IN ENVIRONMENT'))
