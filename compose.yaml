@@ -1,11 +1,11 @@
 # ${XXXXX} means variable XXXXX is stored in the .env file
 services:
-  frontend:
+  test_frontend:
     build:
-      context: ./frontend
+      context: ./test_frontend
     env_file: .env
     ports:
-    - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
     restart: unless-stopped
   backend:
     depends_on:

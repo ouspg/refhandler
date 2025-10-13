@@ -4,7 +4,7 @@ from fastapi import FastAPI, Form, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from os import environ
 
-FRONTEND_PORT = int(environ.get("FRONTEND_PORT", 'NO FRONTEND_PORT IN ENVIRONMENT'))
+TEST_FRONTEND_PORT = int(environ.get("TEST_FRONTEND_PORT", 'NO TEST_FRONTEND_PORT IN ENVIRONMENT'))
 BACKEND_URL = f"http://backend:{environ.get("BACKEND_PORT")}"
 
 app = FastAPI()
@@ -53,4 +53,4 @@ async def upload_file(pdf_file: UploadFile = File()):
     return res.json()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=FRONTEND_PORT)
+    uvicorn.run(app, host="0.0.0.0", port=TEST_FRONTEND_PORT)
