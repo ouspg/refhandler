@@ -14,15 +14,9 @@ services:
       context: ./backend
     ports:
     - "8001:8001"
-    # Backup-only container, not used as main database
-
-  pdfuploader:
-    build:
-      context: ./pdfuploader
-    ports:
-      - "8002:8002"
     volumes:
       - pdf_uploads:/pdf_uploads
+    # Backup-only container, not used as main database
 
   postgres:
     image: postgres:17
