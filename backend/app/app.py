@@ -15,7 +15,6 @@ POSTGRES_DB = environ.get("POSTGRES_DB", 'NO POSTGRES_DB IN ENVIRONMENT')
 POSTGRES_SERVER = environ.get("POSTGRES_SERVER", 'NO POSTGRES_SERVER IN ENVIRONMENT')
 POSTGRES_PORT = environ.get("POSTGRES_PORT", 'NO POSTGRES_PORT IN ENVIRONMENT')
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
-
 engine = create_engine(DATABASE_URL)
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/pdf_uploads")
@@ -50,25 +49,6 @@ def add_post(post: Post, session: SessionDep):
     res = {"message": "Post added to database",
            "Posts table after changes": get_all_posts(session)}
     return res
-
-@app.get("/", response_class=HTMLResponse)
-def serve_upload_page():
-    data = """
-    <!DOCTYPE html>
-<html>
-<body>
-
-<h2>Upload a PDF file</h2>
-
-<form method=\"post\" action=\"/upload_pdf\" enctype=\"multipart/form-data\">
-  <input type=\"file\" name=\"pdf_file\" accept=\"application/pdf\"><br><br>
-  <input type=\"submit\" value=\"Upload\">
-</form>
-
-</body>
-</html>
-    """
-    return HTMLResponse(content=data, status_code=200)
 
 @app.post("/upload_pdf")
 async def upload_pdf(pdf_file: UploadFile = File()):

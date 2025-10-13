@@ -22,16 +22,8 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
     ports:
     - ${BACKEND_PORT}:${BACKEND_PORT}
-    restart: unless-stopped
-
-  pdfuploader:
-    build:
-      context: ./pdfuploader
-    env_file: .env
-    ports:
-      - ${PDFUPLOADER_PORT}:${PDFUPLOADER_PORT}
     volumes:
-      - pdf_uploads:/pdf_uploads
+    - pdf_uploads:/pdf_uploads
     restart: unless-stopped
 
   postgres:
