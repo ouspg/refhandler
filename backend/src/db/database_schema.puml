@@ -3,6 +3,7 @@
 
 entity Publication{
     *id: uuid4 <<generated>>
+    *analyse_refs: boolean = True
     name: varchar(n)
     'university
     'faculty
@@ -11,14 +12,18 @@ entity Publication{
     class: enum
     raw_text: text
     --
-    *downloaded: boolean = False
     pdf_id: uuid4 <<FK>>
 }
 
+entity Pdf {
+  *id: uuid4 <<generated>>
+}
+
 entity PublicationAuthorLinktable{
-    *publication_id: uuid4
-    *author_id: uuid4
-    
+    *id: uuid4 <<generated>>
+    --
+    *publication_id: uuid4 <<FK>>
+    *author_id: uuid4 <<FK>>
 }
 
 entity Author{
@@ -27,23 +32,23 @@ entity Author{
     name: varchar(n)
 }
 
-entity Pdf {
-  *id: uuid4 <<generated>>
-}
-
 entity Citation{
+    *id: uuid4 <<generated>>
     raw_text: text
+    --
+    *in_publication: uuid4 <<FK>>
+    *reference: uuid4 <<FK>>
 }
 
-Publication ||--|| Pdf
-Publication }|-- PublicationAuthorLinktable
-Author }|-- PublicationAuthorLinktable
+Publication ||--|| Pdf: pdf_id
+Publication }|-- PublicationAuthorLinktable: publication_id
+Author }|-- PublicationAuthorLinktable: author_id
 
 Publication ||--|{ FetchResult
 FetchResult }|--|| FetchMethod
 
-Publication ||--|{ Citation: in_pub
-Publication }|--|{ Citation: reference
+Publication ||--|{ Citation: in_publication
+Publication ||--|{ Citation: reference
 
 Citation ||--|{ CitationClass
 CitationClass }|--|| CitationClassifier
