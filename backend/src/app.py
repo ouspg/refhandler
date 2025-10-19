@@ -4,8 +4,8 @@ from sqlmodel import Session, select
 from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi.responses import HTMLResponse
 import os
-from models import Post
-from db import initialize_db, get_session
+from backend.src.db.models import Post
+from backend.src.db.db import initialize_db, get_session
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 app = FastAPI()

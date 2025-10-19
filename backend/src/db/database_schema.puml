@@ -1,0 +1,53 @@
+@startuml Database Schema
+'skinparam linetype ortho
+
+entity Publication{
+    *id: uuid4 <<generated>>
+    name: varchar(n)
+    'university
+    'faculty
+    'programme
+    year: int
+    class: enum
+    raw_text: text
+    --
+    *downloaded: boolean = False
+    pdf_id: uuid4 <<FK>>
+}
+
+entity PublicationAuthorLinktable{
+    *publication_id: uuid4
+    *author_id: uuid4
+    
+}
+
+entity Author{
+    *id: uuid4 <<generated>>
+    ORCID: ?
+    name: varchar(n)
+}
+
+entity Pdf {
+  *id: uuid4 <<generated>>
+}
+
+entity Citation{
+    raw_text: text
+}
+
+Publication ||--|| Pdf
+Publication }|-- PublicationAuthorLinktable
+Author }|-- PublicationAuthorLinktable
+
+Publication ||--|{ FetchResult
+FetchResult }|--|| FetchMethod
+
+Publication ||--|{ Citation: in_pub
+Publication }|--|{ Citation: reference
+
+Citation ||--|{ CitationClass
+CitationClass }|--|| CitationClassifier
+Citation ||--|{ CitationEvaluation
+CitationEvaluation }|--|| CitationEvaluator
+
+@enduml
