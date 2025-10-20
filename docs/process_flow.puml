@@ -1,0 +1,98 @@
+@startuml process flow
+autonumber
+
+participant Frontend as f
+participant PdfParser as pdfp
+participant CitationExtractor as ce
+participant ReferenceFetcher as rf
+
+participant Backend as b
+database    Database   as db
+database    Filesystem as fs
+database    Internet as internet
+
+
+group ADD PDF
+
+f -> b: POST /pdf filename.pdf
+activate b
+b -> fs: save pdf as $uuid4.pdf
+b -> db: INSERT Pdf(id = $uuid4, parsed=False)
+b --> f: OK
+deactivate b
+end
+
+group PARSE PDF
+pdfp -> pdfp: CRON trigger
+activate pdfp
+group Fetch files
+pdfp -> b: GET /pdf?parsed=False
+activate b
+b -> db: SELECT * FROM Pdf \nWHERE filename != None AND parsed == False
+db --> b: [Pdf_id1, Pdf_id2, ...]
+fs -> b: fetch [pdf_id1.pdf, pdf_id2.pdf, ...]
+b --> pdfp: pdf_id1.pdf, pdf_id2.pdf, ...]
+deactivate b
+end
+
+group Parse files
+pdfp -> pdfp: parse PDFs
+group Loop over files
+pdfp -> b: POST /publication Publication(filename=pdf_id1, raw_text = ...)
+activate b
+b -> db: INSERT Publication(filename=pdf_id1, analyse_refs=True, raw_text = ...)
+b -> db: UPDATE Pdf SET parsed == True WHERE Pdf.id = Publication.filename
+b -> pdfp: OK
+deactivate b
+deactivate pdfp
+end
+end
+end
+
+group EXTRACT CITATIONS
+ce -> ce: CRON trigger
+activate ce
+
+group Fetch publications
+ce -> b: GET /publiction?analyse_refs=True&raw_text!=None
+activate b
+b -> db: SELECT * FROM Publication \nWHERE analyse_refs == True AND raw_text != None
+db --> b: [publication1, publication2, ...]
+b --> ce: [publication1, publication2, ...]
+deactivate b
+end
+
+group Process references
+ce -> ce: Extract references
+group Loop over references
+ce -> b: POST /publication Publication(analyse_refs = False)
+activate b
+b -> db: INSERT Publication(id = uuid4, analyse_refs = False)
+b --> ce: OK
+deactivate b
+end
+end
+
+group Process citations
+ce -> ce: Extract citations
+group Loop over citations
+ce -> b: POST /citation Citation(in_publication=pub_id1, reference=pub_id2, raw_text=...)
+activate b
+b -> db: INSERT Citation(in_publication=pub_id1, reference=pub_id2, raw_text=...)
+b --> ce: OK
+deactivate b
+deactivate ce
+end
+end
+end
+
+group FETCH REFERENCES #TODO
+rf -> rf: CRON trigger
+
+group Fetch references
+rf -> b: GET /publication?
+end
+end
+
+@enduml
+

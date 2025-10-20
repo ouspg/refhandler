@@ -12,11 +12,12 @@ entity Publication{
     class: enum
     raw_text: text
     --
-    pdf_id: uuid4 <<FK>>
+    filename: pdf_id <<FK>>
 }
 
 entity Pdf {
-  *id: uuid4 <<generated>>
+    *id: uuid4 <<generated>>
+    parsed: boolean = False
 }
 
 entity PublicationAuthorLinktable{
@@ -36,8 +37,8 @@ entity Citation{
     *id: uuid4 <<generated>>
     raw_text: text
     --
-    *in_publication: uuid4 <<FK>>
-    *reference: uuid4 <<FK>>
+    *in_publication: publication_id <<FK>>
+    *reference: publication_id <<FK>>
 }
 
 Publication ||--|| Pdf: pdf_id
