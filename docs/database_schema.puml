@@ -23,8 +23,8 @@ entity Pdf {
 entity PublicationAuthorLinktable{
     *id: uuid4 <<generated>>
     --
-    *publication_id: uuid4 <<FK>>
-    *author_id: uuid4 <<FK>>
+    *publication_id: publication_id <<FK>>
+    *author_id: author_id <<FK>>
 }
 
 entity Author{
