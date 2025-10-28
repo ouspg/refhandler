@@ -41,6 +41,19 @@ entity Citation{
     *reference: publication_id <<FK>>
 }
 
+entity FetchResult{
+    *id: int <<generated>>
+    time: timestamp
+    result: boolean
+}
+
+entity FetchMethod{
+    *id: int <<generated>>
+    fetchmethod: varchar(n)
+    --
+    fetchresult_id: int <<FK>>
+}
+
 Publication ||--|| Pdf: pdf_id
 Publication }|-- PublicationAuthorLinktable: publication_id
 Author }|-- PublicationAuthorLinktable: author_id
