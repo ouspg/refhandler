@@ -17,7 +17,9 @@ entity Publication{
 
 entity Pdf {
     *id: uuid4 <<generated>>
-    parsed: boolean = False
+    parsed: bool = False
+    original_filename: str = None
+
 }
 
 entity PublicationAuthorLinktable{
