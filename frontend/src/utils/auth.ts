@@ -3,4 +3,3 @@ export const isAuthenticated = (): boolean => {
     
     return !!token;
 };
-  
