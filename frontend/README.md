@@ -71,3 +71,14 @@ export default defineConfig([
   },
 ])
 ```
+
+## How to use
+```shell
+node -v  # ensure Node version (>= v20)
+
+cd frontend
+
+npm install  # or `yarn`
+npm run dev  # or `yarn dev`
+
+```
