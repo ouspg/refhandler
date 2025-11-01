@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 
-const Login: React.FC = () => {
+type LoginProps = {
+  user: boolean;
+  setUser: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Login: React.FC<LoginProps> = ({ user, setUser }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [user, setUser] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

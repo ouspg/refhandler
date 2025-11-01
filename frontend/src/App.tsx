@@ -1,23 +1,22 @@
-import { Routes, Route } from "react-router-dom"
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-import Login from "./pages/Login/login"
-import Dashboard from "./pages/Dashboard/Dashboard"
-import ProtectedRoute from "./components/routes/protectedRoute"
+import Login from './pages/Login/login';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 function App() {
+  const [user, setUser] = useState<boolean>(false);
   return (
     <>
-      <Routes>
-        <Route element={<ProtectedRoute requireAuth={false} />}>
-          <Route path="/login" element={<Login />} />
-        </Route>
-        
-        <Route element={<ProtectedRoute requireAuth={true} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-      </Routes>
+      {!user && <Login user={user} setUser={setUser} />}
+      {user && (
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="*" element={<h1>404 - Not Found</h1>} />
+        </Routes>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
