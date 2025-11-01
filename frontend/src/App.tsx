@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import './App.css';
 
 import Login from './pages/Login/login';
 import NavBar from './components/NavBar';
@@ -10,7 +11,7 @@ import ProjectManagement from './pages/ProjectManagement/ProjectManagement';
 function App() {
   const [user, setUser] = useState<boolean>(false);
   return (
-    <>
+    <div className="app-root">
       {!user && <Login user={user} setUser={setUser} />}
       {user && (
         <>
@@ -23,7 +24,7 @@ function App() {
           </Routes>
         </>
       )}
-    </>
+    </div>
   );
 }
 

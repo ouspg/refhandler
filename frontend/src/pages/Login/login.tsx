@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './login.css';
 
 type LoginProps = {
   user: boolean;
@@ -20,14 +21,18 @@ const Login: React.FC<LoginProps> = ({ user, setUser }) => {
   };
 
   return (
-    <div>
-      <h1>Login page</h1>
+    <div className="login-page">
+      <div className="login-card" role="region" aria-labelledby="login-title">
+        <h1 id="login-title" className="login-title">
+          Welcome back
+        </h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Username:
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
             <input
+              id="username"
+              className="input"
               value={username}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setUsername(e.target.value)
@@ -35,13 +40,13 @@ const Login: React.FC<LoginProps> = ({ user, setUser }) => {
               name="username"
               autoComplete="username"
             />
-          </label>
-        </div>
+          </div>
 
-        <div>
-          <label>
-            Password:
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
             <input
+              id="password"
+              className="input"
               type="password"
               value={password}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -50,13 +55,15 @@ const Login: React.FC<LoginProps> = ({ user, setUser }) => {
               name="password"
               autoComplete="current-password"
             />
-          </label>
-        </div>
+          </div>
 
-        <button type="submit">Login</button>
-      </form>
+          <button type="submit" className="btn btn-primary">
+            Login
+          </button>
+        </form>
 
-      {user ? <p>Logged in</p> : <p>Not logged in</p>}
+        <p className="login-status">{user ? 'Logged in' : 'Not logged in'}</p>
+      </div>
     </div>
   );
 };

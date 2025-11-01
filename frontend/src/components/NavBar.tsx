@@ -69,7 +69,8 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0.5rem 1rem',
-    background: '#0f172a',
+    /* match login button accent */
+    background: '#2563eb',
     color: '#fff',
   },
   brand: {
@@ -85,13 +86,13 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
   },
   link: {
-    color: '#cbd5e1',
+    color: 'rgba(255,255,255,0.95)',
     textDecoration: 'none',
     padding: '0.25rem 0',
   },
   activeLink: {
     color: '#fff',
-    borderBottom: '2px solid #60a5fa',
+    borderBottom: '2px solid rgba(255,255,255,0.18)',
   },
   actions: {
     display: 'flex',
@@ -99,10 +100,12 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '0.5rem',
   },
   logout: {
-    background: 'transparent',
-    border: '1px solid #334155',
-    color: '#fff',
-    padding: '0.25rem 0.5rem',
+    /* inverted button to stand out on the blue nav */
+    background: '#ffffff',
+    border: '1px solid rgba(255,255,255,0.12)',
+    color: '#2563eb',
+    padding: '0.35rem 0.6rem',
     cursor: 'pointer',
+    borderRadius: '8px',
   },
 };
