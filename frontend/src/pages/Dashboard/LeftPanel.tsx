@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
+import axios from 'axios';
 
 type UploadFile = {
   id: string;
   file: File;
   progress: number;
-  status: 'queued' | 'uploading' | 'done' | 'error';
+  status: 'queued' | 'uploading' | 'done' | 'submitting' | 'uploaded' | 'error';
 };
 
 const LeftPanel: React.FC = () => {
@@ -31,7 +32,7 @@ const LeftPanel: React.FC = () => {
 
     setFiles((prev) => {
       const combined = [...prev, ...newItems];
-      // start uploading newly added files
+      // start client-side simulated upload immediately (Choose files behavior)
       newItems.forEach(startUpload);
       return combined;
     });
@@ -70,27 +71,92 @@ const LeftPanel: React.FC = () => {
     intervals.current[item.id] = id;
   };
 
-  const removeFile = (id: string) => {
-    if (intervals.current[id]) {
-      clearInterval(intervals.current[id]);
-      delete intervals.current[id];
+  // upload a single file to backend using axios and report progress
+  const uploadSingle = async (item: UploadFile) => {
+    setFiles((prev) =>
+      prev.map((p) =>
+        p.id === item.id ? { ...p, status: 'submitting', progress: 0 } : p
+      )
+    );
+
+    // validate file type (backend expects application/pdf)
+    if (item.file.type !== 'application/pdf') {
+      setFiles((prev) =>
+        prev.map((p) => (p.id === item.id ? { ...p, status: 'error' } : p))
+      );
+      return;
     }
+
+    const form = new FormData();
+    form.append('pdf_file', item.file);
+
+    try {
+      await axios.post('/upload_pdf', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (ev: any) => {
+          // axios progress event shape may vary by version; guard accordingly
+          const loaded = ev.loaded ?? ev.progress?.loaded;
+          const total = ev.total ?? ev.progress?.total;
+          if (!total) return;
+          const percent = Math.round((loaded * 100) / total);
+          setFiles((prev) =>
+            prev.map((p) =>
+              p.id === item.id ? { ...p, progress: percent } : p
+            )
+          );
+        },
+      });
+
+      // mark as uploaded to backend
+      setFiles((prev) =>
+        prev.map((p) =>
+          p.id === item.id ? { ...p, progress: 100, status: 'uploaded' } : p
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Upload failed', err);
+      setFiles((prev) =>
+        prev.map((p) => (p.id === item.id ? { ...p, status: 'error' } : p))
+      );
+      return false;
+    }
+  };
+
+  const removeFile = (id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // Placeholder behaviour: in real app you'd send files or references to backend
-      const completed = files.filter((f) => f.status === 'done');
-      console.log(
-        'Submitting files',
-        completed.map((f) => f.file.name)
-      );
-      // Simulate network delay
-      await new Promise((r) => setTimeout(r, 700));
-      // You can update UI to show final submission state here
-      alert(`Submitted ${completed.length} files`);
+      // upload files sequentially and update progress
+      const ready = files.filter((f) => f.status === 'done');
+      if (ready.length === 0) {
+        // nothing ready to send to backend
+        alert(
+          'No files are ready to submit. Wait until client-side upload finishes (status: done) before submitting.'
+        );
+        return;
+      }
+
+      let uploadedCount = 0;
+      for (const f of ready) {
+        const ok = await uploadSingle(f);
+        if (ok) uploadedCount++;
+      }
+
+      if (uploadedCount === 0) {
+        alert(
+          'Upload failed: could not reach backend or all uploads errored. Check backend availability and try again.'
+        );
+      } else if (uploadedCount < ready.length) {
+        alert(
+          `Uploaded ${uploadedCount} of ${ready.length} files. Some uploads failed.`
+        );
+      } else {
+        alert(`Successfully uploaded ${uploadedCount} files to backend.`);
+      }
     } catch (err) {
       console.error(err);
       alert('Submission failed');
