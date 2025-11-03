@@ -1,0 +1,108 @@
+@startuml Database Schema
+'skinparam linetype ortho
+
+entity Publication{
+    *id: uuid4 <<generated>>
+    *analyse_refs: boolean = True
+    name: varchar(n)
+    university: int <<FK>>
+    faculty: int <<FK>>
+    programme: int <<FK>>
+    year: int
+    class: enum
+    raw_text: text
+    --
+    filename: pdf_id <<FK>>
+}
+
+entity Pdf {
+    *id: uuid4 <<generated>>
+    original_filename: str = None
+    uploaded_by: user_id = None
+    --
+    parsed: bool = False
+    virustotal_scan: bool = None
+}
+
+entity PublicationAuthorLinktable{
+    *id: uuid4 <<generated>>
+    --
+    *publication_id: publication_id <<FK>>
+    *author_id: author_id <<FK>>
+}
+
+entity Author{
+    *id: uuid4 <<generated>>
+    ORCID: varchar(n)
+    first_name: varchar(n)
+    last_name: varchar(n)
+}
+
+entity Citation{
+    *id: uuid4 <<generated>>
+    raw_text: text
+    --
+    *in_publication: publication_id <<FK>>
+    *references: references_id <<FK>>
+}
+
+entity CitationReferenceLinkTable{
+    *id: int <<generated>>
+    --
+    citation_id: uuid4 <<FK>>
+    referenced_pub_id: uuid4 <<FK>>
+}
+
+entity FetchResult{
+    *id: int <<generated>>
+    time: timestamp
+    result: boolean
+}
+
+entity FetchMethod{
+    *id: int <<generated>>
+    fetchmethod: varchar(n)
+    --
+    fetchresult_id: int <<FK>>
+}
+
+entity University{
+    *id: int <<generated>>
+    name: varchar(n)
+}
+
+entity Faculty{
+    *id: int <<generated>>
+    name: varchar(n)
+}
+
+entity Programme{
+    *id: int <<generated>>
+    name: varchar(n)
+}
+
+"User(frontend db)" ||--|{ Pdf: uploaded_by
+
+Publication ||--|| Pdf: pdf_id
+Publication }|-- PublicationAuthorLinktable: publication_id
+Author }|-- PublicationAuthorLinktable: author_id
+
+Publication ||--|{ FetchResult
+FetchResult }|--|| FetchMethod
+
+Publication ||--|{ Citation: in_publication
+Publication ||--|{ Citation: reference
+
+Citation }|-- CitationReferenceLinkTable: citation_id
+CitationReferenceLinkTable --|{ Publication: referenced_pub_id
+
+Citation ||--|{ CitationClass
+CitationClass }|--|| CitationClassifier
+Citation ||--|{ CitationEvaluation
+CitationEvaluation }|--|| CitationEvaluator
+
+Publication }|--|| University: university
+Publication }|--|| Faculty: faculty
+Publication }|--|| Programme: programme
+
+@enduml

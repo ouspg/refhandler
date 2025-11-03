@@ -1,9 +1,19 @@
+import './Dashboard.css';
+import LeftPanel from './LeftPanel';
+import RightPanel from './RightPanel';
+
 function Dashboard() {
   return (
-    <div>
-      <h1>This is the dashboard page</h1>
+    <div className="dashboard-container">
+      <div className="dashboard-left-column">
+        <LeftPanel />
+      </div>
+
+      <div className="dashboard-right-column">
+        <RightPanel />
+      </div>
     </div>
-  )
+  );
 }
 
 export default Dashboard;

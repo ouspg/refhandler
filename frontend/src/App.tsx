@@ -1,23 +1,31 @@
-import { Routes, Route } from "react-router-dom"
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
 
-import Login from "./pages/Login/login"
-import Dashboard from "./pages/Dashboard/Dashboard"
-import ProtectedRoute from "./components/routes/protectedRoute"
+import Login from './pages/Login/login';
+import NavBar from './components/NavBar';
+import Dashboard from './pages/Dashboard/Dashboard';
+import UserManagement from './pages/UserManagement/UserManagement';
+import ProjectManagement from './pages/ProjectManagement/ProjectManagement';
 
 function App() {
+  const [user, setUser] = useState<boolean>(false);
   return (
-    <>
-      <Routes>
-        <Route element={<ProtectedRoute requireAuth={false} />}>
-          <Route path="/login" element={<Login />} />
-        </Route>
-        
-        <Route element={<ProtectedRoute requireAuth={true} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-      </Routes>
-    </>
-  )
+    <div className="app-root">
+      {!user && <Login user={user} setUser={setUser} />}
+      {user && (
+        <>
+          <NavBar setUser={setUser} />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/user-management" element={<UserManagement />} />
+            <Route path="/project-management" element={<ProjectManagement />} />
+            <Route path="*" element={<h1>404 - Not Found</h1>} />
+          </Routes>
+        </>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;

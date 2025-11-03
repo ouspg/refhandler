@@ -1,0 +1,151 @@
+.dashboard-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 16px;
+  /* padding: 16px; */
+  box-sizing: border-box;
+}
+
+.dashboard-left-column {
+  flex: 0 0 33.3333%; /* left column fixed to one third */
+}
+
+.dashboard-right-column {
+  flex: 1 1 66.6667%; /* right column takes remaining space */
+}
+
+.dashboard-left,
+.dashboard-right {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .dashboard-left-column,
+  .dashboard-right-column {
+    flex: none;
+    width: 100%;
+  }
+}
+
+/* Left panel upload styles */
+.upload-area {
+  padding: 8px 0 12px 0;
+}
+
+.upload-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.choose-button {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #0b5fff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.clear-button {
+  padding: 6px 10px;
+  background: #f3f4f6;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.hint {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.file-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #eef2ff;
+  background: #fbfdff;
+}
+
+.file-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.file-name {
+  font-size: 14px;
+}
+
+.file-size {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.progress {
+  height: 8px;
+  background: #e6eefc;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0b5fff, #3b82f6);
+  width: 0%;
+  transition: width 0.25s linear;
+}
+
+.file-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.status {
+  font-size: 12px;
+  text-transform: capitalize;
+  color: #374151;
+}
+
+.remove-button {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.submit-button {
+  padding: 8px 14px;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

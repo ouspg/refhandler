@@ -1,8 +1,21 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  /* allow root to use full viewport; avoid constraining width */
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-root {
+  /* main app container styles (moved from inline styles) */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100vw;
+  /* optional padding moved from previous #root if desired */
   padding: 2rem;
-  text-align: center;
 }
 
 .logo {
