@@ -28,15 +28,15 @@ Install [Docker Desktop for MacOS](https://docs.docker.com/desktop/setup/install
 2. (Optional) Change `POSTGRES_PASSWORD` in .env file
 3. Open a terminal in the project root folder
 4. Run the command `docker-compose up`
-5. Open <http://localhost:8000/> in your browser
+5. Open <http://localhost:5173/> in your browser
 
 ## Refhandler components
 
-- [Frontend](frontend): #TODO
+- [Frontend](frontend): React frontend
 - [Test Frontend](test_frontend): Developer frontend for testing the backend and process containers
 - [Postgres](postgres): Relational SQL database
 - [compose.yaml](compose.yaml): Configuration and deployment of project's docker containers
-- [.env](.env): Project configuration
+- [.env](.env): Environmental variables
 
 ## Plan:
 
