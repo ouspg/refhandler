@@ -7,6 +7,14 @@ services:
     ports:
     - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
     restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+    env_file: .env
+    ports:
+    - 5173:5173
+    restart: unless-stopped
+
   backend:
     depends_on:
       postgres:

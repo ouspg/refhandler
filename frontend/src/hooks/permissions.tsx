@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StorageManager } from "../utils/Storage/StorageManager";
+import { StorageManager } from "../utils/Storage/storageManager";
 
 export const usePermissions = () => {
   StorageManager.init("local");
