@@ -91,7 +91,7 @@ const LeftPanel: React.FC = () => {
     form.append('pdf_file', item.file);
 
     try {
-      await axios.post('/upload_pdf', form, {
+      await axios.post('/api/pdfs', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (ev: any) => {
           // axios progress event shape may vary by version; guard accordingly

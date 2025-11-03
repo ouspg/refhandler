@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from os import environ
 
 TEST_FRONTEND_PORT = int(environ.get("TEST_FRONTEND_PORT", 'NO TEST_FRONTEND_PORT IN ENVIRONMENT'))
-BACKEND_URL = f"http://backend:{environ.get("BACKEND_PORT")}"
+BACKEND_URL = f"http://backend:{environ.get("BACKEND_PORT")}/api"
 
 app = FastAPI()
 
@@ -28,7 +28,7 @@ def serve_website():
 
 <h2>Upload a PDF file</h2>
 
-<form method="post" action="/upload_pdf" enctype="multipart/form-data">
+<form method="post" action="/pdfs" enctype="multipart/form-data">
   <input type="file" name="pdf_file" accept="application/pdf"><br><br>
   <input type="submit" value="Upload">
 </form>
@@ -44,7 +44,7 @@ def add_post_to_database(db_text: str = Form()):
     res = requests.post(BACKEND_URL+"/posts", json={"db_text": f"{db_text}"})
     return res.json()
 
-@app.post("/upload_pdf")
+@app.post("/pdfs")
 async def upload_file(pdf_file: UploadFile = File()):
     files = {
         'pdf_file': (pdf_file.filename, await pdf_file.read(), pdf_file.content_type)

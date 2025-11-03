@@ -12,7 +12,7 @@ services:
       context: ./frontend
     env_file: .env
     ports:
-    - 5173:5173
+    - ${FRONTEND_PORT}:${FRONTEND_PORT}
     restart: unless-stopped
 
   backend:
