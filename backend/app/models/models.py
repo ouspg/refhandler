@@ -9,4 +9,6 @@ class Post(SQLModel, table=True):
 class PDF(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True)
     original_filename: str | None = None
+    uploaded_by: int | None
     parsed: bool = False
+    virustotal_scan: bool | None = None
