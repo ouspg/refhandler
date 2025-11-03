@@ -1,0 +1,117 @@
+@startuml process flow with cron
+autonumber
+
+participant Frontend as f
+participant PdfParser as pdfp
+participant CitationExtractor as ce
+participant ReferenceFetcher as rf
+
+participant "**Backend**" as b
+database    Database   as db #Blue
+database    Filesystem as fs #Cyan
+database    Internet as internet #Green
+
+
+group ADD PDF
+
+f -[#Red]> b: POST /pdf filename.pdf
+activate b
+b -[#Cyan]> fs: save pdf as $uuid4.pdf
+b -[#Blue]> db: INSERT Pdf(id = $uuid4, parsed=False)
+return pdf_id
+end
+
+group PARSE PDF
+pdfp -> pdfp: CRON trigger
+group Fetch files
+pdfp -[#Red]> b: GET /pdf?parsed=False
+activate b
+b -[#Blue]> db: SELECT * FROM Pdf \nWHERE filename != None AND parsed == False
+db --[#Blue]> b: [Pdf_id1, Pdf_id2, ...]
+b -[#Cyan]> fs: fetch [pdf_id1.pdf, pdf_id2.pdf, ...]
+fs --[#Cyan]> b: [pdf_id1.pdf, pdf_id2.pdf, ...]
+return [pdf_id1.pdf, pdf_id2.pdf, ...]
+end
+
+group Loop over files
+pdfp -> pdfp: parse PDF
+pdfp -[#Red]> b: POST /publication Publication(filename=pdf_id1, raw_text = ...)
+activate b
+b -[#Blue]> db: INSERT Publication(filename=pdf_id1, analyse_refs=True, raw_text = ...)
+b -[#Blue]> db: UPDATE Pdf SET parsed = True WHERE Pdf.id == Publication.filename
+return publication1_id
+end
+end
+
+
+group EXTRACT CITATIONS
+ce -> ce: CRON trigger
+
+group Fetch publications
+ce -[#Red]> b: GET /publication?analyse_refs=True&raw_text!=None
+activate b
+b -[#Blue]> db: SELECT * FROM Publication \nWHERE analyse_refs == True AND raw_text != None
+db --[#Blue]> b: [publication1, publication2, ...]
+return [publication1, publication2, ...]
+end
+
+group Process references
+ce -> ce: Extract references
+group Loop over references
+ce -[#Red]> b: POST /publication Publication(analyse_refs = False)
+activate b
+b -[#Blue]> db: INSERT Publication(id = uuid4, analyse_refs = False)
+return publication_id
+end
+end
+
+ce -> ce: Extract citations
+group Loop over citations
+ce -[#Red]> b: POST /citation Citation(in_publication=pub_id1, reference=pub_id2, raw_text=...)
+activate b
+b -[#Blue]> db: INSERT Citation(in_publication=pub_id1, reference=pub_id2, raw_text=...)
+return citation_id
+end
+end
+
+group FETCH REFERENCES
+rf -> rf: CRON trigger
+group Fetch publications with missing file
+rf -[#Red]> b: GET /publication?filename=None
+activate b
+b -[#Blue]> db: SELECT * FROM Publication \nWHERE filename == None
+db --[#Blue]> b: [publication1, publication2, ...]
+return [publication1, publication2, ...]
+end
+
+rf -> rf: Parse Publications
+group Download missing file
+rf -[#Green]> internet: FetchMethod1(publication1)
+return NOT OK
+rf -[#Red]> b: POST /fetchresult FetchResult(result=False)
+activate b
+b -[#Blue]> db: INSERT FetchResult(time=now(), result=False)
+return fetchresult_id
+
+rf -[#Green]> internet: FetchMethod2(publication1)
+return publication1.pdf
+rf -[#Red]> b: POST /fetchresult FetchResult(result=True)
+activate b
+b -[#Blue]> db: INSERT FetchResult(time=now(), result=True)
+return fetchresult_id
+
+rf -[#Red]> b: POST /pdf publication1.pdf
+activate b
+b -[#Cyan]> fs: save pdf as $uuid4.pdf
+b -[#Blue]> db: INSERT Pdf(id = $uuid4, parsed=False)
+return pdf_id
+
+rf -[#Red]> b: PATCH /publication Publication(id=publication1_id, filename=pdf_id)
+activate b
+b -[#Blue]> db: UPDATE Publication(id=publication1_id, filename=pdf_id)
+return publication1_id
+end
+end
+
+@enduml
+
