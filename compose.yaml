@@ -8,6 +8,9 @@ services:
     - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
     restart: unless-stopped
   frontend:
+    depends_on:
+        backend:
+          condition: service_started
     build:
       context: ./frontend
     env_file: .env
