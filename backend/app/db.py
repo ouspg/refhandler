@@ -11,9 +11,5 @@ DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERV
 
 engine = create_engine(DATABASE_URL)
 
-def initialize_db():
+def init_db():
     SQLModel.metadata.create_all(bind=engine)
-    
-def get_session():
-    with Session(engine) as session:
-        yield session
