@@ -6,6 +6,13 @@ class Post(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     db_text: str
     
+class PostCreate(SQLModel):
+    db_text: str
+
+class PostPublic(SQLModel):
+    id: int
+    db_text: str
+
 class PDF(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True)
     original_filename: str | None = None

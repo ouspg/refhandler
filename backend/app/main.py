@@ -1,12 +1,8 @@
-from typing import Annotated
 import uvicorn
-from sqlmodel import Session, select
-from fastapi import FastAPI, File, UploadFile, Depends
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 import os
-from app.models.models import Post
-from app.db import initialize_db, get_session
+from app.db import initialize_db
 from app.api.main import api_router
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
@@ -17,7 +13,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-app = FastAPI()
+app = FastAPI(docs_url='/api/docs', 
+                redoc_url='/api/redoc',
+                openapi_url='/api/openapi.json')
 app.include_router(api_router, prefix="/api")
 
 # Set all CORS enabled origins

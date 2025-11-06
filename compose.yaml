@@ -4,6 +4,8 @@ services:
     build:
       context: ./test_frontend
     env_file: .env
+    networks:
+    - frontend
     ports:
     - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
     restart: unless-stopped
@@ -14,6 +16,8 @@ services:
     build:
       context: ./frontend
     env_file: .env
+    networks:
+    - frontend
     ports:
     - ${FRONTEND_PORT}:${FRONTEND_PORT}
     restart: unless-stopped
@@ -31,6 +35,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_SERVER: ${POSTGRES_SERVER}
       POSTGRES_PORT: ${POSTGRES_PORT}
+    networks:
+    - frontend
+    - backend
     ports:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
@@ -44,6 +51,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+    - backend
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
@@ -66,6 +75,9 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+    - frontend
+    - backend
     ports:
       - ${ADMINER_PORT}:8080
 
@@ -81,6 +93,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - postgres_backups:/mnt/backups
     restart: unless-stopped
+
+networks:
+  frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  backend:
 
 volumes:
   pdf_uploads:
