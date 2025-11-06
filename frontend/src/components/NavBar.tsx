@@ -4,10 +4,10 @@ import { useUserStore } from '../store/userStore';
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const { setUser } = useUserStore();
+  const { user, setUser } = useUserStore();
 
   const handleLogout = () => {
-    setUser(false);
+    setUser(null);
     navigate('/');
   };
 
@@ -48,7 +48,7 @@ const NavBar = () => {
         </li>
       </ul>
 
-      <div>Hello User</div>
+      <div>Hello {user ? user.username : 'User'}</div>
 
       <div style={styles.actions}>
         <button style={styles.logout} onClick={handleLogout}>
