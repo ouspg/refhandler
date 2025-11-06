@@ -1,12 +1,10 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useUserStore } from '../store/userStore';
 
-type Props = {
-  setUser: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const NavBar: React.FC<Props> = ({ setUser }) => {
+const NavBar = () => {
   const navigate = useNavigate();
+  const { setUser } = useUserStore();
 
   const handleLogout = () => {
     setUser(false);

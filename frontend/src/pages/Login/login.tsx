@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
+import { useUserStore } from '../../store/userStore';
 import './login.css';
 
-type LoginProps = {
-  user: boolean;
-  setUser: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const Login: React.FC<LoginProps> = ({ user, setUser }) => {
+const Login = () => {
+  const { user, setUser } = useUserStore();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin') {
-      setUser(true);
-    } else {
-      alert('Wrong username or password');
-      setUser(false);
-    }
+    const login = () => {
+      if (username === 'admin' && password === 'admin') {
+        setUser(true);
+      } else {
+        alert('Wrong username or password');
+        setUser(false);
+      }
+    };
+    login();
   };
 
   return (

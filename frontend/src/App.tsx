@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useUserStore } from './store/userStore';
 import './App.css';
 
 import Login from './pages/Login/login';
@@ -9,13 +9,14 @@ import UserManagement from './pages/UserManagement/UserManagement';
 import ProjectManagement from './pages/ProjectManagement/ProjectManagement';
 
 function App() {
-  const [user, setUser] = useState<boolean>(false);
+  const { user } = useUserStore();
+
   return (
     <div className="app-root">
-      {!user && <Login user={user} setUser={setUser} />}
+      {!user && <Login />}
       {user && (
         <>
-          <NavBar setUser={setUser} />
+          <NavBar />
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/user-management" element={<UserManagement />} />
