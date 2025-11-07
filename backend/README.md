@@ -1,5 +1,7 @@
 # Refhandler backend
 
+API documentation available at the `/api/docs` endpoint.
+
 ## Running unit tests
 
 ### Linux
