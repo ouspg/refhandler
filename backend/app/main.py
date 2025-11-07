@@ -2,7 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 import os
-from app.api.main import api_router
+from fastapi import APIRouter
+from app.api.routes import pdfs, posts
 from app.db import init_db
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
@@ -11,6 +12,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost",
     f"http://localhost:{FRONTEND_PORT}",
 ]
+
+api_router = APIRouter()
+api_router.include_router(pdfs.router, prefix="/pdfs", tags=["Pdfs"])
+api_router.include_router(posts.router, prefix="/posts", tags=["Posts"])
 
 app = FastAPI(docs_url='/api/docs', 
                 redoc_url='/api/redoc',

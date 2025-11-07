@@ -23,9 +23,9 @@ class Pdf(SQLModel, table=True):
 class PdfCreate(SQLModel):
     id: uuid.UUID
     original_filename: str
-    uploaded_by: int | None
+    uploaded_by: int | None = None
     
 class PdfPublic(SQLModel):
     id: uuid.UUID
     original_filename: str
-    uploaded_by: int | None
+    uploaded_by: int | None = None

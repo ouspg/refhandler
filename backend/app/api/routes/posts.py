@@ -3,7 +3,7 @@ from sqlmodel import select
 from app.api.deps import SessionDep
 from app.models.models import Post, PostCreate, PostPublic
 
-router = APIRouter(prefix="/posts")
+router = APIRouter()
 
 @router.get("/")
 def get_all_posts(session: SessionDep):

@@ -6,7 +6,7 @@ from app.models.models import Pdf, PdfCreate, PdfPublic
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-router = APIRouter(prefix="/pdfs")
+router = APIRouter()
 
 @router.post("/", response_model=PdfPublic)
 async def upload_pdf(session: SessionDep, pdf_file: UploadFile = File()):
