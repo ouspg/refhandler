@@ -11,7 +11,7 @@ type UploadFile = {
   status: 'queued' | 'uploading' | 'done' | 'submitting' | 'uploaded' | 'error';
 };
 
-const LeftPanel: React.FC = () => {
+const DashboardTop: React.FC = () => {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -94,7 +94,7 @@ const LeftPanel: React.FC = () => {
     form.append('pdf_file', item.file);
 
     try {
-      await axios.post(`${BACKEND_URL_DEV_MODE}/api/pdfs`, form, {
+      await axios.post(`${BACKEND_URL_DEV_MODE}/api/pdfs/`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (ev: any) => {
           // axios progress event shape may vary by version; guard accordingly
@@ -171,7 +171,7 @@ const LeftPanel: React.FC = () => {
   const allDone = files.length > 0 && files.every((f) => f.status === 'done');
 
   return (
-    <div className="dashboard-left">
+    <div className="dashboard-top-container">
       <h2>Attachments</h2>
 
       <div className="upload-area">
@@ -244,4 +244,4 @@ const LeftPanel: React.FC = () => {
   );
 };
 
-export default LeftPanel;
+export default DashboardTop;

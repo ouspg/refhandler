@@ -79,7 +79,7 @@ export default defineConfig([
 $ node -v  # ensure Node version (>= v20)
 
 # 2. Run backend in dev mode
-$ docker compose up  # -> takes port 5173
+$ docker compose up  # -> takes port 5173  # docker compose build --no-cache backend
   # docker-compose down
 
 # 3. Run frontend in dev mode

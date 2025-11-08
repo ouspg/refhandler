@@ -1,16 +1,16 @@
 import './Dashboard.css';
-import LeftPanel from './LeftPanel';
-import RightPanel from './RightPanel';
+import DashboardTop from './DashboardTop';
+import DashboardBottom from './DashboardBottom';
 
 function Dashboard() {
   return (
     <div className="dashboard-container">
-      <div className="dashboard-left-column">
-        <LeftPanel />
+      <div className="dashboard-top">
+        <DashboardTop />
       </div>
 
-      <div className="dashboard-right-column">
-        <RightPanel />
+      <div className="dashboard-bottom">
+        <DashboardBottom />
       </div>
     </div>
   );
