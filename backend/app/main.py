@@ -10,6 +10,8 @@ FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONM
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
     f"http://localhost:{FRONTEND_PORT}",
+    "http://localhost:5174",  # because `docker compose up` takes port 5173 by default, so we allow 5174 as well for dev mode frontend
+    "http://127.0.0.1:5174",
 ]
 
 

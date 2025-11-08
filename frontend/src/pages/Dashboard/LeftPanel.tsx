@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 
+// @ts-ignore
+const BACKEND_URL_DEV_MODE = import.meta.env.VITE_BACKEND_URL_DEV_MODE || ''; // DevMode should set env variable VITE_BACKEND_URL_DEV_MODE is http://localhost:8001
+
 type UploadFile = {
   id: string;
   file: File;
@@ -91,7 +94,7 @@ const LeftPanel: React.FC = () => {
     form.append('pdf_file', item.file);
 
     try {
-      await axios.post('/api/pdfs', form, {
+      await axios.post(`${BACKEND_URL_DEV_MODE}/api/pdfs`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (ev: any) => {
           // axios progress event shape may vary by version; guard accordingly
