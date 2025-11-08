@@ -7,15 +7,23 @@ from app.api.main import api_router
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
+    "http://127.0.0.1",
     f"http://localhost:{FRONTEND_PORT}",
-    "http://localhost:5174",  # because `docker compose up` takes port 5173 by default, so we allow 5174 as well for dev mode frontend
-    "http://127.0.0.1:5174",
+    f"http://127.0.0.1:{FRONTEND_PORT}",
 ]
 
+EXTRA_ALLOWED_ORIGIN_PORTS = os.environ.get("EXTRA_ALLOWED_ORIGIN_PORTS", '')  # Extra port for Development purpose, comma separated
+EXTRA_ALLOWED_ORIGIN_PORTS = [
+    p for p in (s.strip() for s in EXTRA_ALLOWED_ORIGIN_PORTS.split(','))
+    if p.isdigit() and 1 <= int(p) <= 65535
+]
+for p in EXTRA_ALLOWED_ORIGIN_PORTS:
+    CORS_ALLOWED_ORIGINS.extend([f"http://localhost:{p}", f"http://127.0.0.1:{p}"])
 
-app = FastAPI(docs_url='/api/docs', 
+app = FastAPI(docs_url='/api/docs',
                 redoc_url='/api/redoc',
                 openapi_url='/api/openapi.json')
 app.include_router(api_router, prefix="/api")

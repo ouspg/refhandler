@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // @ts-ignore
-const BACKEND_URL_DEV_MODE = import.meta.env.VITE_BACKEND_URL_DEV_MODE || ''; // DevMode should set env variable VITE_BACKEND_URL_DEV_MODE is http://localhost:8001
+const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL || ''; // DevMode should set env variable VITE_BACKEND_BASE_URL is http://localhost:8001
 
 type UploadFile = {
   id: string;
@@ -94,7 +94,7 @@ const DashboardTop: React.FC = () => {
     form.append('pdf_file', item.file);
 
     try {
-      await axios.post(`${BACKEND_URL_DEV_MODE}/api/pdfs/`, form, {
+      await axios.post(`${BACKEND_BASE_URL}/api/pdfs/`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (ev: any) => {
           // axios progress event shape may vary by version; guard accordingly
