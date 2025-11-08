@@ -76,6 +76,11 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`view-${p.id}`}
                 title="View"
+                onClick={() => {
+                  const url = `/reviewpage/${p.id}`;
+                  // open in a new tab safely
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
               >
                 {/* eye icon */}
                 <svg
