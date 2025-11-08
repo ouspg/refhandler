@@ -1,37 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './DashboardBottom.css';
+import papersService from '../service/papers';
 
 const RecentPapers: React.FC = () => {
-  const papers = [
-    {
-      id: 'p1',
-      title: 'Machine Learning Thesis 2024.pdf',
-      size: '2.4 MB',
-      citations: 67,
-      timeAgo: '2 hours ago',
-    },
-    {
-      id: 'p2',
-      title: 'Climate Change Research.pdf',
-      size: '1.8 MB',
-      citations: 89,
-      timeAgo: '5 hours ago',
-    },
-    {
-      id: 'p3',
-      title: 'Quantum Computing Paper.pdf',
-      size: '1.2 MB',
-      citations: 45,
-      timeAgo: '1 day ago',
-    },
-    {
-      id: 'p4',
-      title: 'Neuroscience Study.pdf',
-      size: '892 KB',
-      citations: 34,
-      timeAgo: '2 days ago',
-    },
-  ];
+  const [papers, setPapers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  console.log(papers);
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const data = await papersService.getAll();
+        if (mounted) setPapers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load papers', err);
+        if (mounted) setPapers([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="dashboard-top-container">
+        <h3>Loading recent papers…</h3>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-top-container">
