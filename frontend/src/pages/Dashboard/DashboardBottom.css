@@ -1,0 +1,118 @@
+/* Styles specific to DashboardBottom to make the two panels equal width
+   This file intentionally overrides the global .dashboard-left-column and
+   .dashboard-right-column sizing only within the bottom component.
+*/
+
+.dashboard-bottom {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.dashboard-bottom .dashboard-left-column,
+.dashboard-bottom .dashboard-right-column {
+  min-width: 0; /* allow children to shrink properly */
+}
+
+/* Make left column wider (approx 60/40 split) to reduce empty white space on the right */
+.dashboard-bottom .dashboard-left-column {
+  flex: 0 0 50%;
+}
+
+.dashboard-bottom .dashboard-right-column {
+  flex: 1 1 50%;
+}
+
+/* Keep panels visually consistent with project theme */
+.dashboard-bottom .dashboard-top-container,
+.dashboard-bottom .dashboard-right {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+}
+
+/* Ensure the paper list uses full width of the left panel (overrides global .file-list width:50%) */
+.dashboard-bottom .file-list {
+  width: 100%;
+}
+
+/* Allow file items to use full available width inside the left column */
+.dashboard-bottom .file-item {
+  max-width: none;
+}
+
+/* Emphasize the file title in the left Recent Papers list (darker & bolder) */
+.dashboard-bottom .file-name {
+  font-weight: 600; /* semi-bold */
+  color: #0f1724; /* darker text to improve contrast */
+}
+
+/* Paper item left icon */
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #eef6ff, #f8fbff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e6f0ff;
+  color: #0b5fff;
+}
+
+.meta-line {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.paper-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #374151;
+}
+
+.icon-button:hover {
+  background: #f3f4f6;
+}
+
+.source-badge {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-bottom {
+    flex-direction: column;
+  }
+
+  .dashboard-bottom .dashboard-left-column,
+  .dashboard-bottom .dashboard-right-column {
+    width: 100%;
+    flex: none;
+  }
+}

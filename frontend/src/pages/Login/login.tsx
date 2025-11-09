@@ -1,23 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useUserStore } from '../../store/userStore';
 import './login.css';
+import { StorageManager } from '../../utils/Storage/storageManager';
 
-type LoginProps = {
-  user: boolean;
-  setUser: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const Login: React.FC<LoginProps> = ({ user, setUser }) => {
+const Login = () => {
+  const { user, setUser } = useUserStore();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
+  useEffect(() => {
+    // Initialize StorageManager
+    try {
+      StorageManager.init('local');
+    } catch (e) {
+      // ignore if storage is already initialized
+    }
+
+    // Check token in localStorage
+    const token = StorageManager.getInstance().getItem('auth_token');
+
+    // Check token validity
+    if (token) {
+      // Mock API call to validate token
+      const mockValidateToken = (token: string): Promise<boolean> => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            // Mock valid token if it's 'mocked-jwt-token'
+            resolve(token === 'mocked-jwt-token');
+          }, 200);
+        });
+      };
+
+      mockValidateToken(token).then((isValid) => {
+        if (isValid) {
+          setUser({ username: 'admin', token });
+        } else {
+          StorageManager.getInstance().removeItem('auth_token');
+          setUser(null);
+        }
+      });
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin') {
-      setUser(true);
-    } else {
-      alert('Wrong username or password');
-      setUser(false);
-    }
+    const login = () => {
+      if (username === 'admin' && password === 'admin') {
+        // Mocked token
+        const _token = 'mocked-jwt-token';
+        // Save token in localStorage, (sessionStorage, or Cookie)
+        StorageManager.getInstance().setItem('auth_token', _token);
+        setUser({ username, token: _token });
+      } else {
+        alert('Wrong username or password');
+        setUser(null);
+      }
+    };
+    login();
   };
 
   return (
@@ -62,7 +101,9 @@ const Login: React.FC<LoginProps> = ({ user, setUser }) => {
           </button>
         </form>
 
-        <p className="login-status">{user ? 'Logged in' : 'Not logged in'}</p>
+        <p className="login-status">
+          {user ? `Logged in as ${user.username}` : 'Not logged in'}
+        </p>
       </div>
     </div>
   );

@@ -72,15 +72,21 @@ export default defineConfig([
 ]);
 ```
 
-## How to use
+## How to use in dev mode
 
 ```shell
-node -v  # ensure Node version (>= v20)
+# 1. Check version
+$ node -v  # ensure Node version (>= v20)
 
-cd frontend
+# 2. Run backend in dev mode
+$ docker compose up  # -> takes port 5173  # docker compose build --no-cache backend
+  # docker-compose down
 
-npm install  # or `yarn`
-npm run dev  # or `yarn dev`
+# 3. Run frontend in dev mode
+$ cd frontend
+
+$ npm install  # or `yarn`
+$ npm run dev  # or `yarn dev`  #  takes port 5174
 
 # Login by using user/pass: admin/admin
 ```

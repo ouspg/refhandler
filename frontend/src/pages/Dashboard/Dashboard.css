@@ -1,12 +1,19 @@
 .dashboard-container {
   display: flex;
+  flex-direction: column; /* stack: top upload, bottom content */
   gap: 16px;
-  align-items: flex-start;
+  align-items: stretch;
   margin-top: 16px;
   /* padding: 16px; */
   box-sizing: border-box;
 }
 
+.dashboard-top,
+.dashboard-bottom {
+  width: 100%;
+}
+
+/* preserve column helpers if needed elsewhere */
 .dashboard-left-column {
   flex: 0 0 33.3333%; /* left column fixed to one third */
 }
@@ -15,7 +22,7 @@
   flex: 1 1 66.6667%; /* right column takes remaining space */
 }
 
-.dashboard-left,
+.dashboard-top-container,
 .dashboard-right {
   background: #fff;
   border: 1px solid #e6e6e6;
@@ -77,6 +84,22 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Make each file entry narrower (about half page) and center them */
+.file-list {
+  width: 50%;
+}
+
+.file-item {
+  max-width: 720px; /* limit maximum width */
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .file-item {
+    width: 100%; /* full width on small screens */
+  }
 }
 
 .file-item {

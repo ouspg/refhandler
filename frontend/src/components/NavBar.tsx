@@ -1,15 +1,13 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useUserStore } from '../store/userStore';
 
-type Props = {
-  setUser: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const NavBar: React.FC<Props> = ({ setUser }) => {
+const NavBar = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useUserStore();
 
   const handleLogout = () => {
-    setUser(false);
+    setUser(null);
     navigate('/');
   };
 
@@ -50,7 +48,7 @@ const NavBar: React.FC<Props> = ({ setUser }) => {
         </li>
       </ul>
 
-      <div>Hello User</div>
+      <div>Hello {user ? user.username : 'User'}</div>
 
       <div style={styles.actions}>
         <button style={styles.logout} onClick={handleLogout}>
