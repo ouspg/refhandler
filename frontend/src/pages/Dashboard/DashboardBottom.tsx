@@ -29,6 +29,12 @@ const RecentPapers: React.FC = () => {
     };
   }, []);
 
+  const openReview = (id: any) => {
+    const url = `/reviewpage/${id}`;
+    // open in a new tab safely
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   if (loading) {
     return (
       <div className="dashboard-top-container">
@@ -43,7 +49,20 @@ const RecentPapers: React.FC = () => {
       <div className="file-list">
         {papers.map((p) => (
           <div key={p.id} className="file-item">
-            <div className="item-icon" aria-hidden>
+            <div
+              className="item-icon"
+              aria-hidden
+              role="button"
+              tabIndex={0}
+              onClick={() => openReview(p.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  openReview(p.id);
+                  e.preventDefault();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
               {/* simple document icon */}
               <svg
                 width="18"
@@ -68,7 +87,18 @@ const RecentPapers: React.FC = () => {
                 />
               </svg>
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => openReview(p.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  openReview(p.id);
+                  e.preventDefault();
+                }
+              }}
+            >
               <div className="file-name">{p.title}</div>
               <div className="meta-line">
                 {p.size} • {p.citations} citations • {p.timeAgo}
@@ -80,10 +110,9 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`view-${p.id}`}
                 title="View"
-                onClick={() => {
-                  const url = `/reviewpage/${p.id}`;
-                  // open in a new tab safely
-                  window.open(url, '_blank', 'noopener,noreferrer');
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openReview(p.id);
                 }}
               >
                 {/* eye icon */}
@@ -116,6 +145,10 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`download-${p.id}`}
                 title="Download"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // TODO: implement download behaviour
+                }}
               >
                 {/* download icon */}
                 <svg
@@ -152,6 +185,10 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`more-${p.id}`}
                 title="More"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // TODO: implement more menu
+                }}
               >
                 {/* kebab */}
                 <svg
