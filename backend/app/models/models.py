@@ -13,9 +13,19 @@ class PostPublic(SQLModel):
     id: int
     db_text: str
 
-class PDF(SQLModel, table=True):
+class Pdf(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True)
-    original_filename: str | None = None
-    uploaded_by: int | None
+    original_filename: str
+    uploaded_by: int | None = None
     parsed: bool = False
     virustotal_scan: bool | None = None
+    
+class PdfCreate(SQLModel):
+    id: uuid.UUID
+    original_filename: str
+    uploaded_by: int | None = None
+    
+class PdfPublic(SQLModel):
+    id: uuid.UUID
+    original_filename: str
+    uploaded_by: int | None = None
