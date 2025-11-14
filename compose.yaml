@@ -9,6 +9,7 @@ services:
     ports:
     - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
     restart: unless-stopped
+
   frontend:
     depends_on:
         backend:
@@ -54,10 +55,10 @@ services:
     networks:
     - backend
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - postgres_backups:/mnt/backups
+    - postgres_data:/var/lib/postgresql/data
+    - postgres_backups:/mnt/backups
     labels:
       deck-chores.pg-dump.command: sh -c "pg_dump -c -U ${POSTGRES_USER} ${POSTGRES_DB} > postgres_$(date +%F).sql"
       deck-chores.pg-dump.interval: daily
@@ -69,6 +70,22 @@ services:
       start_period: 30s
       timeout: 10s
 
+# ClamAV-rest: ClamAV virus scanner with REST API
+  clamav-rest:
+    image: ajilaag/clamav-rest
+    environment:
+      MAX_FILE_SIZE: 100M
+    networks:
+    - frontend
+    ports:
+    - 9000:9000
+    - 9443:9443
+    volumes:
+    - clamav_db:/var/lib/clamav
+    - postgres_backups:/mnt/backups
+
+
+# Adminer: Database management dashboard
   adminer:
     image: adminer
     depends_on:
@@ -81,7 +98,7 @@ services:
     ports:
       - ${ADMINER_PORT}:8080
 
-
+# Deck-chores: Cron Scheduler for docker containers
   deck-chores:
     image: ghcr.io/funkyfuture/deck-chores:1
     deploy:
@@ -105,3 +122,4 @@ volumes:
   pdf_uploads:
   postgres_data:
   postgres_backups:
+  clamav_db:
