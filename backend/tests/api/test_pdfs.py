@@ -1,13 +1,32 @@
 from fastapi.testclient import TestClient
+import os
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
 
 def test_post(client: TestClient):
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
-        response = client.post("/api/pdfs", files={'pdf_file': pdf_file})
-        data = response.json()
-        assert response.status_code == 200
+        # Upload test pdf file
+        response_post = client.post("/api/pdfs", files={'pdf_file': pdf_file})
+        data = response_post.json()
+        assert response_post.status_code == 200
         assert data["original_filename"] == "test.pdf"
         assert data["uploaded_by"] == None
         
+        # Get uploaded test file from backend and compare contents with original
+        response_get = client.get(f"api/pdfs/{data["id"]}")
+        pdf_file.seek(0)
+        assert pdf_file.read() == response_get.content
+        # remove uploaded test file
+        response_delete = client.delete(f"api/pdfs/{data["id"]}")
+        assert response_delete.status_code == 200
+
+def test_post_with_virus_scan(client: TestClient):
+    with open("backend/tests/api/test.pdf", "rb") as pdf_file:
+        # Upload test pdf file with virus scan
+        response = client.post("/api/pdfs?virus_scan=True", files={'pdf_file': pdf_file})
+        
+        # Virus scan is not implemented yet
+        assert response.status_code == 501
+
 def test_post_with_missing_data(client: TestClient):
         response = client.post("/api/pdfs", files={'pdf_file': ""})
         assert response.status_code == 422
