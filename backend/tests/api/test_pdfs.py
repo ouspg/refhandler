@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 import os
-UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
 
 def test_post(client: TestClient):
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
@@ -15,11 +14,16 @@ def test_post(client: TestClient):
         response_get = client.get(f"api/pdfs/{data["id"]}")
         pdf_file.seek(0)
         assert pdf_file.read() == response_get.content
+        
         # remove uploaded test file
         response_delete = client.delete(f"api/pdfs/{data["id"]}")
         assert response_delete.status_code == 200
+        
+        # Make sure file was removed
+        response_after_delete = client.get(f"api/pdfs/{data["id"]}")
+        assert response_after_delete.status_code == 404
 
-def test_post_with_virus_scan(client: TestClient):
+def test_post_with_unimplemented_virus_scan(client: TestClient):
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
         # Upload test pdf file with virus scan
         response = client.post("/api/pdfs?virus_scan=True", files={'pdf_file': pdf_file})
