@@ -1,37 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './DashboardBottom.css';
+import papersService from '../service/papers';
 
 const RecentPapers: React.FC = () => {
-  const papers = [
-    {
-      id: 'p1',
-      title: 'Machine Learning Thesis 2024.pdf',
-      size: '2.4 MB',
-      citations: 67,
-      timeAgo: '2 hours ago',
-    },
-    {
-      id: 'p2',
-      title: 'Climate Change Research.pdf',
-      size: '1.8 MB',
-      citations: 89,
-      timeAgo: '5 hours ago',
-    },
-    {
-      id: 'p3',
-      title: 'Quantum Computing Paper.pdf',
-      size: '1.2 MB',
-      citations: 45,
-      timeAgo: '1 day ago',
-    },
-    {
-      id: 'p4',
-      title: 'Neuroscience Study.pdf',
-      size: '892 KB',
-      citations: 34,
-      timeAgo: '2 days ago',
-    },
-  ];
+  const [papers, setPapers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  console.log(papers);
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const data = await papersService.getAll();
+        if (mounted) setPapers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load papers', err);
+        if (mounted) setPapers([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const openReview = (id: any) => {
+    const url = `/reviewpage/${id}`;
+    // open in a new tab safely
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  if (loading) {
+    return (
+      <div className="dashboard-top-container">
+        <h3>Loading recent papers…</h3>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-top-container">
@@ -39,7 +49,20 @@ const RecentPapers: React.FC = () => {
       <div className="file-list">
         {papers.map((p) => (
           <div key={p.id} className="file-item">
-            <div className="item-icon" aria-hidden>
+            <div
+              className="item-icon"
+              aria-hidden
+              role="button"
+              tabIndex={0}
+              onClick={() => openReview(p.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  openReview(p.id);
+                  e.preventDefault();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
               {/* simple document icon */}
               <svg
                 width="18"
@@ -64,7 +87,18 @@ const RecentPapers: React.FC = () => {
                 />
               </svg>
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => openReview(p.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  openReview(p.id);
+                  e.preventDefault();
+                }
+              }}
+            >
               <div className="file-name">{p.title}</div>
               <div className="meta-line">
                 {p.size} • {p.citations} citations • {p.timeAgo}
@@ -76,6 +110,10 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`view-${p.id}`}
                 title="View"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openReview(p.id);
+                }}
               >
                 {/* eye icon */}
                 <svg
@@ -107,6 +145,10 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`download-${p.id}`}
                 title="Download"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // TODO: implement download behaviour
+                }}
               >
                 {/* download icon */}
                 <svg
@@ -143,6 +185,10 @@ const RecentPapers: React.FC = () => {
                 className="icon-button"
                 aria-label={`more-${p.id}`}
                 title="More"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // TODO: implement more menu
+                }}
               >
                 {/* kebab */}
                 <svg
