@@ -49,11 +49,9 @@ function UserManagement() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle save
   const saveUser = () => {
     if (!validate()) return;
     console.log('User form submitted', form);
-    // Reset form
     setForm({
       firstName: '',
       middleName: '',
