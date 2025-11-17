@@ -1,7 +1,7 @@
 from fastapi import File, UploadFile, APIRouter, HTTPException
 from fastapi.responses import FileResponse
 import os, uuid
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, ScannersDep
 from app.models.models import Pdf, PdfCreate, PdfPublic
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
@@ -19,12 +19,13 @@ async def get_pdf(file_id: str):
         raise HTTPException(404, "File not found")
 
 @router.post("/", response_model=PdfPublic)
-async def upload_pdf(session: SessionDep, pdf_file: UploadFile = File(), 
-                     virus_scan: bool = False):
-    if virus_scan:
-        raise HTTPException(501, "Virus scan not implemented")
+async def upload_pdf(session: SessionDep, scanners: ScannersDep, pdf_file: UploadFile = File()):
     if pdf_file.content_type != "application/pdf" or pdf_file.filename == None:
         raise HTTPException(422, "Invalid PDF file")
+    
+    scan_result = await scanners.clamav_scan(pdf_file)
+    if(scan_result.status_code == 406):
+        raise HTTPException(406, f"ClamAV scan result: {pdf_file.filename} not safe")
     
     new_filename = uuid.uuid4()
     file_location = os.path.join(UPLOAD_DIR, str(new_filename) + ".pdf")

@@ -27,6 +27,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      clamav-rest:
+        condition: service_healthy
     build:
       context: ./backend
     env_file: .env
@@ -70,19 +72,28 @@ services:
       start_period: 30s
       timeout: 10s
 
-# ClamAV-rest: ClamAV virus scanner with REST API
+# ClamAV virus scanner with REST API
   clamav-rest:
-    image: ajilaag/clamav-rest
+    build:
+      context: ./clamav-rest
+    env_file: .env
     environment:
       MAX_FILE_SIZE: 100M
     networks:
-    - frontend
+    #- frontend # Uncomment to curl the api from localhost
+    - backend
     ports:
-    - 9000:9000
-    - 9443:9443
+    - ${CLAMAV_PORT}:${CLAMAV_PORT}
+    #- 9443:9443
     volumes:
     - clamav_db:/var/lib/clamav
     - postgres_backups:/mnt/backups
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:${CLAMAV_PORT} || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 10
 
 
 # Adminer: Database management dashboard
