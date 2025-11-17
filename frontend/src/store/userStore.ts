@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export interface User {
   username: string;
   token: string;
+  role?: string | undefined;
 }
 
 interface UserState {
