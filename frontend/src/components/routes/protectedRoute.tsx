@@ -9,7 +9,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ allowedRoles = [], requireAuth = true, children }: ProtectedRouteProps) => {
   const { user } = useUserStore();
-  console.log(user);
   if (requireAuth && !user?.token || !allowedRoles?.includes(user?.role || '')) {
     return <Navigate to="/login" replace />;
   }
