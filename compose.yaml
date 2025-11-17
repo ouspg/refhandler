@@ -48,7 +48,8 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:17
+    build:
+      context: ./postgres
     env_file: .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -60,9 +61,11 @@ services:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
     - postgres_data:/var/lib/postgresql/data
-    - postgres_backups:/mnt/backups
+    - postgres_backups:/backups
+    post_start:
+      - command: sh -c "./dump_database.sh"
     labels:
-      deck-chores.pg-dump.command: sh -c "pg_dump -c -U ${POSTGRES_USER} ${POSTGRES_DB} > postgres_$(date +%F).sql"
+      deck-chores.pg-dump.command: sh -c ""./dump_database.sh"
       deck-chores.pg-dump.interval: daily
     restart: unless-stopped
     healthcheck:
