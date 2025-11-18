@@ -13,10 +13,12 @@ CORS_ALLOWED_ORIGINS = [
     f"http://localhost:{FRONTEND_PORT}",
 ]
 
+# Combine all routers into one API router
 api_router = APIRouter()
 api_router.include_router(pdfs.router, prefix="/pdfs", tags=["Pdfs"])
 api_router.include_router(posts.router, prefix="/posts", tags=["Posts"])
 
+# Initialize app and include api router with /api prefix
 app = FastAPI(docs_url='/api/docs', 
                 redoc_url='/api/redoc',
                 openapi_url='/api/openapi.json')

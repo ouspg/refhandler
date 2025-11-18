@@ -7,8 +7,14 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
 from app.main import app
-from app.api.deps import get_session
+from app.api.depdendancies import get_session
 from app.api.scanners import Scanners
+
+"""
+Contains pytest fixtures that are used for all other pytest tests.
+Used to override dependancies such as Postges with unit-testable mockups.
+
+"""
 
 # Mock database with sqlite in-memory database
 @pytest.fixture(name="session")

@@ -8,5 +8,6 @@ def get_session():
     with Session(engine) as session:
         yield session
 
+# Used for injecting dependancies at API endpoint creation
 SessionDep = Annotated[Session, Depends(get_session)]
 ScannersDep = Annotated[Scanners, Depends(Scanners)]
