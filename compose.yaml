@@ -1,15 +1,5 @@
 # ${XXXXX} means variable XXXXX is stored in the .env file
 services:
-  test_frontend:
-    build:
-      context: ./test_frontend
-    env_file: .env
-    networks:
-    - frontend
-    ports:
-    - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
-    restart: unless-stopped
-
   frontend:
     depends_on:
         backend:
@@ -90,7 +80,6 @@ services:
     #- 9443:9443
     volumes:
     - clamav_db:/var/lib/clamav
-    - postgres_backups:/mnt/backups
     restart: unless-stopped
     healthcheck:
       test: curl --fail http://localhost:${CLAMAV_PORT} || exit 1
