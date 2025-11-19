@@ -6,7 +6,6 @@ CLAMAV_PORT = os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT')
 CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 
 # TODO: Add virustotal API. Skip if VIRUSTOTAL_API_KEY == ""
-# TODO: Refactor to run all scans with Scanners.scan()
 
 # Class for calling file scanner APIs
 # If file is safe: return HTTP 200

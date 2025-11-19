@@ -13,6 +13,7 @@ def test_post(client: TestClient):
         response_get = client.get(f"api/pdfs/{data["id"]}")
         pdf_file.seek(0)
         assert pdf_file.read() == response_get.content
+        assert response_get.headers["content-type"] == "application/pdf"
         
         # remove uploaded test file
         response_delete = client.delete(f"api/pdfs/{data["id"]}")
