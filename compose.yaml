@@ -35,6 +35,8 @@ services:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
     - pdf_uploads:/pdf_uploads
+    - ./backend/alembic.ini:/app/alembic.ini
+    - ./backend/alembic/:/app/alembic
     restart: unless-stopped
 
   postgres:

@@ -33,3 +33,23 @@ pip install -r backend/requirements-dev.txt
 # Run unit tests.
 pytest ./backend/tests/
 ```
+
+## Running database migrations with alembic
+
+Making changes to SQLModels in `/backend/app/models.py` will lead to a conflict between new and existing database tables.
+
+To update the existing database tables to the new models without losing data, migration scripts can be generated using alembic.
+
+Because backend and postgres containers are running in a docker network that isn't connected to localhost, the alembic commands must be run inside the backend container.
+
+```bash
+# Start the compose file
+docker compose up
+
+# Open bash inside the backend container
+docker compose exec backend bash
+
+# Run alembic revision to autogenerate migration scripts
+alembic revision --autogenerate -m "revision name here"
+
+```
