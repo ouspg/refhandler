@@ -1,6 +1,13 @@
 import uuid
 from sqlmodel import Field, SQLModel
 
+##############################################
+# WARNING
+# If you make change to SQLModels with table=True,
+# you must generate matching database migration scripts:
+# /backend/README.md#Running database migrations with alembic
+##############################################
+
 # Post is a placefolder model for testing
 class Post(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
