@@ -37,6 +37,8 @@ services:
     - pdf_uploads:/pdf_uploads
     - ./backend/alembic.ini:/app/alembic.ini
     - ./backend/alembic/:/app/alembic
+    post_start:
+    - command: sh -c "alembic upgrade head"
     restart: unless-stopped
 
   postgres:
