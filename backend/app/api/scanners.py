@@ -7,8 +7,8 @@ CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 
 # TODO: Add virustotal API. Skip if VIRUSTOTAL_API_KEY == ""
 
-VIRUSTOTAL_API_KEY = ""
-url = "https://www.virustotal.com/api/v3/files/"  
+VIRUSTOTAL_API_KEY = os.environ.get("VIRUSTOTAL_API_KEY", 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT')
+VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"  
 
 
 # Class for calling file scanner APIs
@@ -28,6 +28,10 @@ class Scanners:
 
     # Scan files using VirusTotal API
     async def virustotal_scan(self, file: UploadFile):
+        # Skip scanning if no API key is provided
+        if VIRUSTOTAL_API_KEY == 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT' or VIRUSTOTAL_API_KEY == "":
+            return Response(content = "No API key provided", status_code = 401)  
+        
         headers = {
             "accept": "application/json",
             "x-apikey": VIRUSTOTAL_API_KEY
@@ -36,7 +40,7 @@ class Scanners:
         bytes = await file.read()
         readable_hash = hashlib.sha256(bytes).hexdigest()
 
-        response = requests.get(url + readable_hash, headers=headers)
+        response = requests.get(VIRUSTOTAL_URL + readable_hash, headers=headers)
         return response
     
 
