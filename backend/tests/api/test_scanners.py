@@ -18,3 +18,13 @@ async def test_clamav_scan_mockup(mocker):
         
         response = await scanners.scan(UploadFile(pdf_file))
         assert response.status_code == 406
+
+@pytest.mark.asyncio
+async def test_virustotal_scan():
+    scanners = Scanners()
+    with open("backend/tests/api/test.pdf", "rb") as pdf_file:
+        
+        
+        response = await scanners.virustotal_scan(UploadFile(pdf_file))
+        assert response.status_code == 200
+        
