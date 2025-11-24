@@ -5,8 +5,6 @@ import os, hashlib
 CLAMAV_PORT = os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT')
 CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 
-# TODO: Add virustotal API. Skip if VIRUSTOTAL_API_KEY == ""
-
 VIRUSTOTAL_API_KEY = os.environ.get("VIRUSTOTAL_API_KEY", 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT')
 VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"  
 
@@ -39,7 +37,8 @@ class Scanners:
         
         bytes = await file.read()
         readable_hash = hashlib.sha256(bytes).hexdigest()
-
+    
+        #TODO: Parse response to check if file is safe or not
         response = requests.get(VIRUSTOTAL_URL + readable_hash, headers=headers)
         return response
     
