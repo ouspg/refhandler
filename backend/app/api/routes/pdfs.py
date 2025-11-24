@@ -37,6 +37,7 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep, pdf_file: Uploa
     new_filename = uuid.uuid4()
     file_location = os.path.join(UPLOAD_DIR, str(new_filename) + ".pdf")
     with open(file_location, "wb") as f:
+        pdf_file.file.seek(0)
         f.write(pdf_file.file.read())
     
     # Add file metadata to database
