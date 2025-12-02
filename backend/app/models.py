@@ -39,3 +39,8 @@ class PdfPublic(SQLModel):
     id: uuid.UUID
     original_filename: str
     uploaded_by: int | None = None
+    
+class VirusScanResult(SQLModel, table=True):
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    scan_results: str
