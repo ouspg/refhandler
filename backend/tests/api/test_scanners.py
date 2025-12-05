@@ -20,8 +20,9 @@ async def test_clamav_scan_mockup(mocker):
         assert response.status_code == 406
 
 @pytest.mark.asyncio
-async def test_virustotal_scan_without_apikey():
+async def test_virustotal_scan_without_apikey(mocker):
     scanners = Scanners()
+    mocker.patch("app.api.scanners.Scanners.virustotal_scan", return_value={"status_code": 401, "results": "foobar"})
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
         
         content_hash = await get_sha256_hash(UploadFile(pdf_file))
