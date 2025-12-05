@@ -36,11 +36,9 @@ class Scanners:
             "x-apikey": VIRUSTOTAL_API_KEY
         }
     
+        # Call Virustotal file API and parse response
         response = requests.get(VIRUSTOTAL_URL + pdf_content_hash, headers=headers)
         results = parse_virustotal_response(response)
-        
-        if results["status_code"] == 401:
-            return results
 
         malicious, suspicious = results["malicious"], results["suspicious"]
         if malicious > 2:

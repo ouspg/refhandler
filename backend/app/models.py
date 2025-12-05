@@ -8,19 +8,6 @@ from sqlmodel import Field, SQLModel, Relationship
 # /backend/README.md#Running database migrations with alembic
 ##############################################
 
-# Post is a placefolder model for testing
-class Post(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    db_text: str
-    
-class PostCreate(SQLModel):
-    db_text: str
-
-class PostPublic(SQLModel):
-    id: int
-    db_text: str
-
-
 class VirusScanResult(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
