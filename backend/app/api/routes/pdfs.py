@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 import os, uuid, json
 from app.api.depdendancies import SessionDep, ScannersDep
 from app.api.scanners import get_sha256_hash
-from app.models import Pdf, VirusScanResult
+from app.models import Pdf, PdfPublic, VirusScanResult
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -20,7 +20,7 @@ async def get_pdf(file_id: str):
     else:
         raise HTTPException(404, "File not found")
 
-@router.post("/")
+@router.post("/", response_model=PdfPublic)
 async def upload_pdf(session: SessionDep, scanners: ScannersDep, pdf_file: UploadFile):
     # Reject files with wrong content type or no filename
     # TODO: More checking. Check magic bytes?
@@ -43,7 +43,7 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep, pdf_file: Uploa
     new_filename = await pdfutils.add_to_disk(pdf_file)
     
     # Add file metadata to database
-    return await pdfutils.add_to_db(session, new_filename, pdf_file.filename)
+    return await pdfutils.add_to_db(session, new_filename, pdf_file.filename, scan_results_db.id)
 
 @router.delete("/{file_id}")
 async def get_file(file_id: str):
@@ -58,8 +58,8 @@ async def get_file(file_id: str):
 
 class pdfutils:
     @staticmethod
-    async def add_to_db(session: SessionDep, new_filename: uuid.UUID, original_filename: str):
-        db_pdf = Pdf(id = new_filename, original_filename=original_filename)
+    async def add_to_db(session: SessionDep, new_filename: uuid.UUID, original_filename: str, scan_results_id: uuid.UUID):
+        db_pdf = Pdf(id = new_filename, original_filename=original_filename, scan_results_id=scan_results_id)
         session.add(db_pdf)
         session.commit()
         session.refresh(db_pdf)

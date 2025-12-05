@@ -27,5 +27,5 @@ async def test_virustotal_scan_without_apikey():
         content_hash = await get_sha256_hash(UploadFile(pdf_file))
         response = await scanners.virustotal_scan(content_hash)
         # 401 if no API key provided
-        assert response.status_code == 401  
+        assert response["status_code"] == 401  
         

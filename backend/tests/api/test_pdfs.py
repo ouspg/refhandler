@@ -4,7 +4,8 @@ from httpx import Response
 
 def test_post(client: TestClient, mocker):
     # Mock ClamAV scan result with safe file
-    mocker.patch("app.api.scanners.Scanners.scan", return_value={"clamav": {"status_code": 200, "results": "foobar"}})
+    mocker.patch("app.api.scanners.Scanners.clamav_scan", return_value=Response(200, json={"results": "foobar"}))
+    mocker.patch("app.api.scanners.Scanners.virustotal_scan", return_value={"status_code": 200, "results": "foobar"})
     
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
         # Upload test pdf file

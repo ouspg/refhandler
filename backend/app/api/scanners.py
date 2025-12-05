@@ -26,21 +26,39 @@ class Scanners:
     async def virustotal_scan(self, pdf_content_hash: str):
         # Skip scanning if no API key is provided
         if VIRUSTOTAL_API_KEY == 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT' or VIRUSTOTAL_API_KEY == "":
-            return Response( 401, text="No API key provided")  
+            return {
+                    "status_code": 401,
+                    "results": "No API key provided" 
+                    }
         
         headers = {
             "accept": "application/json",
             "x-apikey": VIRUSTOTAL_API_KEY
         }
     
-        #TODO: Parse response to check if file is safe or not
         response = requests.get(VIRUSTOTAL_URL + pdf_content_hash, headers=headers)
-        return response
-    
+        results = parse_virustotal_response(response)
+        
+        if results["status_code"] == 401:
+            return results
+
+        malicious, suspicious = results["malicious"], results["suspicious"]
+        if malicious > 2:
+            return {
+            "status_code": 406,
+            "results": results
+            }
+        else:
+            return {
+                "status_code": 200,
+                "results": results
+            }
+
     # Run all scanners
     async def scan(self, file: UploadFile, pdf_content_hash: str = "") -> dict[str, dict]:
         if pdf_content_hash == "":
             pdf_content_hash = await get_sha256_hash(file)
+
         # Run all scanners and return responses
         clamav_response = await self.clamav_scan(file)
         virustotal_response = await self.virustotal_scan(pdf_content_hash)
@@ -48,8 +66,8 @@ class Scanners:
         scan_results = {}
         scan_results["clamav"] = {"status_code": clamav_response.status_code,
                                   "results": clamav_response.text}
-        scan_results["virustotal"] = {"status_code": virustotal_response.status_code,
-                                  "results": virustotal_response.text}
+        scan_results["virustotal"] = {"status_code": virustotal_response["status_code"],
+                                  "results": virustotal_response["results"]}
 
         return scan_results
 
@@ -57,3 +75,28 @@ async def get_sha256_hash(file: UploadFile):
         bytes = await file.read()
         await file.seek(0)
         return hashlib.sha256(bytes).hexdigest()
+
+"""
+Example Virustotal API response
+
+{
+  "malicious": 1,
+  "suspicious": 0,
+  "undetected": 70,
+  "harmless": 0,
+  "timeout": 1,
+  "confirmed-timeout": 0,
+  "failure": 0,
+  "type-unsupported": 4
+}
+"""
+def parse_virustotal_response(response: requests.models.Response):
+    data = response.json()
+
+    if "error" in data:
+        code, message = data["error"].values()
+        return {"status_code": 401,
+                "results": f"Virustotal API error: {code}:{message}"
+                }
+    
+    return data["data"]["attributes"]["last_analysis_stats"]
