@@ -17,6 +17,15 @@ def create_user(session: Session, userCreate: UserCreate) -> User:
 
 #TODO: update_user
 
+def get_user_by_id(session: Session, id: uuid.UUID | str):
+    if type(id) == str:
+        user_id = uuid.UUID(id)
+    else: 
+        user_id = id
+    
+    db_user = session.get(User, user_id)
+    return db_user
+
 def get_user_by_email(session: Session, email: str) -> User | None:
     user_with_email = select(User).where(User.email == email)
     session_user = session.exec(user_with_email).first()

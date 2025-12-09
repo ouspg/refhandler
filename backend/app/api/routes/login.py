@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
-
+from fastapi import APIRouter, HTTPException
 
 from app import crud, security
 from app.api.depdendancies import SessionDep, OAuth2Dep

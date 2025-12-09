@@ -15,6 +15,12 @@ def test_create_user(client: TestClient, session: Session):
     assert created_user.hashed_password != None
     assert type(created_user.id) == uuid.UUID
 
+def test_get_user_by_id(client: TestClient, session: Session):
+    created_user = crud.create_user(session, test_user)
+
+    user_by_id = crud.get_user_by_id(session, created_user.id)
+    assert user_by_id == created_user
+
 def test_get_user_by_email(client: TestClient, session: Session):
     created_user = crud.create_user(session, test_user)
 

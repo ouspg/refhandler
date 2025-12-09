@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlmodel import Session
-import jwt
+import jwt, uuid
 
 from app.db import engine
 from app.api.scanners import Scanners
@@ -29,7 +29,8 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
     except (jwt.InvalidTokenError):
         raise HTTPException(403, "Could not decode token")
     
-    user = session.get(User, decoded_token["subject"])
+    user_id = uuid.UUID(decoded_token["subject"])
+    user = session.get(User, user_id)
     
     if not user:
         raise HTTPException(404, "User not found")
