@@ -84,6 +84,7 @@ services:
     #- 9443:9443
     volumes:
     - clamav_db:/var/lib/clamav
+    - clamav_data:/clamav/data
     restart: unless-stopped
     healthcheck:
       test: curl --fail http://localhost:${CLAMAV_PORT} || exit 1
@@ -130,3 +131,4 @@ volumes:
   postgres_data:
   postgres_backups:
   clamav_db:
+  clamav_data:

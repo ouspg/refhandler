@@ -4,4 +4,3 @@ pytest-dotenv
 pytest-coverage
 pytest-mock
 pytest-asyncio
-httpx

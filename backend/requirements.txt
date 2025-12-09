@@ -5,3 +5,4 @@ python-multipart
 sqlmodel
 psycopg2-binary
 alembic
+httpx

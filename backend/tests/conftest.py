@@ -38,7 +38,7 @@ def client_fixture(session: Session):
     def get_session_override():  
         return session
     app.dependency_overrides[get_session] = get_session_override
-    app.dependency_overrides[Scanners] = ScannersOverride
+    #app.dependency_overrides[Scanners] = ScannersOverride
     client = TestClient(app)  
     yield client  
     app.dependency_overrides.clear() 
