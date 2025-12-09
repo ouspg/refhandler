@@ -1,5 +1,6 @@
 # Based on: https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/core/security.py
 from datetime import datetime, timedelta, timezone
+from typing import Any
 import jwt
 import os
 from passlib.context import CryptContext
@@ -10,9 +11,9 @@ DEFAULT_EXPIRATION = timedelta(weeks=1)
 
 cc = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def create_jwt_token(subject: str, expires_delta: timedelta = DEFAULT_EXPIRATION) -> str:
+def create_jwt_token(subject: str | Any, expires_delta: timedelta = DEFAULT_EXPIRATION) -> str:
     expire = datetime.now(timezone.utc) + expires_delta
-    encoded_jwt = jwt.encode(payload = {"expiration": expire.isoformat(), "subject": subject},
+    encoded_jwt = jwt.encode(payload = {"expiration": expire.isoformat(), "subject": str(subject)},
                             key = SECRET_KEY,
                             algorithm=ALGORITHM
                             )

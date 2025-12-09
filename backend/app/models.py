@@ -55,7 +55,7 @@ class UserBase(SQLModel):
     role: UserRole = Field(default=UserRole.user, sa_column=Column(Enum(UserRole)))
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=128)
 
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
