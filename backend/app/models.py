@@ -1,5 +1,7 @@
 import uuid
-from sqlmodel import Field, SQLModel, Relationship
+import enum
+from sqlmodel import Field, SQLModel, Relationship, Enum, Column
+from pydantic import EmailStr
 
 ##############################################
 # WARNING
@@ -36,3 +38,25 @@ class PdfPublic(SQLModel):
     uploaded_by: int | None
     parsed: bool = False
     scan_results: VirusScanResult
+
+class UserRole(str, enum.Enum):
+    admin = "admin"
+    manager = "manager"
+    user = "user"
+
+
+class UserBase(SQLModel):
+    firstName: str | None = None
+    middleName: str | None = None
+    lastName: str | None = None
+    email: EmailStr = Field(unique=True, index=True)
+    phone: str | None = None
+    status: str | None = None
+    role: UserRole = Field(default=UserRole.user, sa_column=Column(Enum(UserRole)))
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    hashed_password: str

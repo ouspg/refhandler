@@ -6,3 +6,7 @@ sqlmodel
 psycopg2-binary
 alembic
 httpx
+pyjwt
+passlib
+pydantic[email]
+bcrypt==4.3.0

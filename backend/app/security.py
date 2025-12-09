@@ -1,0 +1,25 @@
+# Based on: https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/core/security.py
+from datetime import datetime, timedelta, timezone
+import jwt
+import os
+from passlib.context import CryptContext
+
+ALGORITHM = "HS256"
+SECRET_KEY = str(os.environ.get("SECRET_KEY", 'NO SECRET_KEY IN ENVIRONMENT'))
+DEFAULT_EXPIRATION = timedelta(weeks=1)
+
+cc = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def create_jwt_token(subject: str, expires_delta: timedelta = DEFAULT_EXPIRATION) -> str:
+    expire = datetime.now(timezone.utc) + expires_delta
+    encoded_jwt = jwt.encode(payload = {"expiration": expire.isoformat(), "subject": subject},
+                            key = SECRET_KEY,
+                            algorithm=ALGORITHM
+                            )
+    return encoded_jwt
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    return cc.verify(password, hashed_password)
+
+def get_password_hash(password: str) -> str:
+    return cc.hash(password)
