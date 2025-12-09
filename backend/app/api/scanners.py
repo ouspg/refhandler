@@ -21,6 +21,8 @@ class Scanners:
         
         response = requests.post(CLAMAV_SCAN_URL, files=files)
         return response
+        
+        #TODO: add print for results to show in terminal
     
     # Scan files using VirusTotal API
     async def virustotal_scan(self, pdf_content_hash: str):
@@ -40,6 +42,7 @@ class Scanners:
         response = requests.get(VIRUSTOTAL_URL + pdf_content_hash, headers=headers)
         results = parse_virustotal_response(response)
 
+        # Determine if file is malicious based on scan results
         malicious, suspicious = results["malicious"], results["suspicious"]
         if malicious > 2:
             return {
@@ -88,6 +91,7 @@ Example Virustotal API response
   "type-unsupported": 4
 }
 """
+
 def parse_virustotal_response(response: requests.models.Response):
     data = response.json()
 
