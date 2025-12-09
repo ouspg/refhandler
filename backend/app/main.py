@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 import os
 from fastapi import APIRouter
-from app.api.routes import pdfs
+from app.api.routes import pdfs, login
 from app.db import init_db
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
@@ -16,6 +16,7 @@ CORS_ALLOWED_ORIGINS = [
 # Combine all routers into one API router
 api_router = APIRouter()
 api_router.include_router(pdfs.router, prefix="/pdfs", tags=["Pdfs"])
+api_router.include_router(login.router, prefix="/login", tags=["Login"])
 
 # Initialize app and include api router with /api prefix
 app = FastAPI(docs_url='/api/docs', 
