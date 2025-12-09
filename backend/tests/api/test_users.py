@@ -61,3 +61,7 @@ def test_get_users_invalid_id(client: TestClient, session: Session):
     invalid_id = uuid.UUID(int=0xDEADBEEF)
     response = client.get(f"/api/users/{invalid_id}", headers=token_header)
     assert response.status_code == 404
+    
+def test_signup(client: TestClient, session: Session):
+    response = client.post(f"/api/users/signup", json=test_user.model_dump())
+    assert response.status_code == 200

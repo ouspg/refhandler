@@ -39,11 +39,11 @@ class PdfPublic(SQLModel):
     parsed: bool = False
     scan_results: VirusScanResult
 
+
 class UserRole(str, enum.Enum):
     admin = "admin"
     manager = "manager"
     user = "user"
-
 
 class UserBase(SQLModel):
     firstName: str | None = None
@@ -54,7 +54,7 @@ class UserBase(SQLModel):
     status: str | None = None
     role: UserRole = Field(default=UserRole.user, sa_column=Column(Enum(UserRole)))
 
-class UserCreate(UserBase):
+class UserCreate(UserBase, use_enum_values=True):
     password: str = Field(min_length=8, max_length=128)
 
 class User(UserBase, table=True):
