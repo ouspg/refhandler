@@ -53,3 +53,15 @@ docker compose exec backend bash
 alembic revision --autogenerate -m "revision name here"
 
 ```
+## Troubleshooting start-up errors
+1. If the some of the docker containers don't build up, run "Docker-compose down" and delete "refhandler_postgres_data" in volumes
+
+## Components
+1. Alembic: makes sure that when pdf returns additional parameters that isn't in pdf_model, it doesn't run in error
+2. Pdfs: configurations for taking pdf in
+3. Dependencies: a
+4. Scanners: run pdf through clamav and (virustotal -> if api key not provided)
+5. Models: database table models
+6. Tests: test pdf, scanner with mockup setup in conftest
+    test_pdfs: test for uploading pdf successfully, test post with missing data and test infected mockup pdf
+    test_scanners: test clamav scan and (virustotal -> if api key not provided)
