@@ -1,3 +1,4 @@
+# pylint: disable=import-error, missing-function-docstring, missing-module-docstring, line-too-long, fixme
 # Based on: https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/crud.py
 
 import uuid
@@ -6,30 +7,33 @@ from sqlmodel import Session, select
 from app.security import get_password_hash, verify_password
 from app.models import User, UserCreate
 
-def create_user(session: Session, userCreate: UserCreate) -> User:
+
+def create_user(session: Session, user_create: UserCreate) -> User:
     db_user = User.model_validate(
-        userCreate, update={"hashed_password": get_password_hash(userCreate.password)}
+        user_create, update={
+            "hashed_password": get_password_hash(user_create.password)}
     )
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
     return db_user
 
-#TODO: update_user
+# TODO: update_user
 
-def get_user_by_id(session: Session, id: uuid.UUID | str):
-    if type(id) == str:
-        user_id = uuid.UUID(id)
-    else: 
-        user_id = id
-    
+
+def get_user_by_id(session: Session, user_id: uuid.UUID | str):
+    if isinstance(user_id, str):
+        user_id = uuid.UUID(user_id)
+
     db_user = session.get(User, user_id)
     return db_user
+
 
 def get_user_by_email(session: Session, email: str) -> User | None:
     user_with_email = select(User).where(User.email == email)
     session_user = session.exec(user_with_email).first()
     return session_user
+
 
 def authenticate_user(session: Session, email: str, password: str) -> User | None:
     db_user = get_user_by_email(session, email)
@@ -39,6 +43,6 @@ def authenticate_user(session: Session, email: str, password: str) -> User | Non
     if not verify_password(password, db_user.hashed_password):
         # Given password and stored password hash didn't match
         return None
-    
+
     # User was found in database and password hash matched
     return db_user
