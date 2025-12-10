@@ -5,15 +5,25 @@
 ### Authentication
 
 1. Create login JSON payload `{"username": user_email,"password": user_password}`. Note the login credentials are `email:password`, but FastAPI security library uses Oauth2 password flow, which is why the payload key is `username` instead of `email`.
+<<<<<<< HEAD
 2. POST the login payload to `/api/login/access-token`
 3. If login credentials are valid, the API generates and sends back a JWT token as a string
 4. Add the JWT token to API requests as a header: `Authorization: Bearer <token>`
+=======
+2. Send the login payload to `/api/login/access-token`
+3. If login credentials are valid, the API responds with a string containing the encoded JWT token
+4. Add the encoded JWT token to API requests as a header: `Authorization: Bearer <token>`
+>>>>>>> 6bd6bded8a0b77734276c781cfcd43830a976c87
 
 ### /api/users
 
 - `GET /api/users/me` Get user information for the **currently authenticated user**
 - `GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
+<<<<<<< HEAD
 - `POST /api/users/signup` **Register a new user account** by sending a POST request with a JSON payload matching the pydantic model `UserCreate` (see `/backend/app/models.py` for details)
+=======
+- `POST /api/users/signup` **Register a new user account** by sending a Post request with a JSON payload matching the pydantic model `UserCreate` (see `/backend/app/models.py` for details)
+>>>>>>> 6bd6bded8a0b77734276c781cfcd43830a976c87
 
 ### /api/pdfs
 
