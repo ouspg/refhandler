@@ -17,11 +17,17 @@ entity Publication{
 
 entity Pdf {
     *id: uuid4 <<generated>>
+    sha256_hash: str
     original_filename: str = None
     uploaded_by: user_id = None
     --
     parsed: bool = False
-    virustotal_scan: bool = None
+    virus_scan: virus_scan_result_id <<FK>>
+}
+
+entity VirusScanResult {
+    *id: uuid4 <<generated>>
+    scan_results: varchar(n)
 }
 
 entity PublicationAuthorLinktable{
@@ -82,6 +88,7 @@ entity Programme{
 }
 
 "User(frontend db)" ||--|{ Pdf: uploaded_by
+VirusScanResult ||--|| Pdf: virus_scan
 
 Publication ||--|| Pdf: pdf_id
 Publication }|-- PublicationAuthorLinktable: publication_id

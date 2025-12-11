@@ -1,14 +1,5 @@
 # ${XXXXX} means variable XXXXX is stored in the .env file
 services:
-  test_frontend:
-    build:
-      context: ./test_frontend
-    env_file: .env
-    networks:
-    - frontend
-    ports:
-    - ${TEST_FRONTEND_PORT}:${TEST_FRONTEND_PORT}
-    restart: unless-stopped
   frontend:
     depends_on:
         backend:
@@ -26,6 +17,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      clamav-rest:
+        condition: service_healthy
     build:
       context: ./backend
     env_file: .env
@@ -42,10 +35,15 @@ services:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
     - pdf_uploads:/pdf_uploads
+    - ./backend/alembic.ini:/app/alembic.ini
+    - ./backend/alembic/:/app/alembic
+    post_start:
+    - command: sh -c "alembic upgrade head"
     restart: unless-stopped
 
   postgres:
-    image: postgres:17
+    build:
+      context: ./postgres
     env_file: .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -54,12 +52,14 @@ services:
     networks:
     - backend
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - postgres_backups:/mnt/backups
+    - postgres_data:/var/lib/postgresql/data
+    - postgres_backups:/backups
+    post_start:
+      - command: sh -c "./dump_database.sh"
     labels:
-      deck-chores.pg-dump.command: sh -c "pg_dump -c -U ${POSTGRES_USER} ${POSTGRES_DB} > postgres_$(date +%F).sql"
+      deck-chores.pg-dump.command: sh -c ""./dump_database.sh"
       deck-chores.pg-dump.interval: daily
     restart: unless-stopped
     healthcheck:
@@ -69,6 +69,31 @@ services:
       start_period: 30s
       timeout: 10s
 
+# ClamAV virus scanner with REST API
+  clamav-rest:
+    build:
+      context: ./clamav-rest
+    env_file: .env
+    environment:
+      MAX_FILE_SIZE: 100M
+    networks:
+    #- frontend # Uncomment to curl the api from localhost
+    - backend
+    ports:
+    - ${CLAMAV_PORT}:${CLAMAV_PORT}
+    #- 9443:9443
+    volumes:
+    - clamav_db:/var/lib/clamav
+    - clamav_data:/clamav/data
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:${CLAMAV_PORT} || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 10
+
+
+# Adminer: Database management dashboard
   adminer:
     image: adminer
     depends_on:
@@ -81,7 +106,7 @@ services:
     ports:
       - ${ADMINER_PORT}:8080
 
-
+# Deck-chores: Cron Scheduler for docker containers
   deck-chores:
     image: ghcr.io/funkyfuture/deck-chores:1
     deploy:
@@ -105,3 +130,5 @@ volumes:
   pdf_uploads:
   postgres_data:
   postgres_backups:
+  clamav_db:
+  clamav_data:

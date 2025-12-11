@@ -1,1 +1,7 @@
 .vscode
+.devcontainer
+__pycache__
+.pytest_cache
+venv
+.coverage
+node_modules
