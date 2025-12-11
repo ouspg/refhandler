@@ -5,7 +5,8 @@ import uuid
 from sqlmodel import Session, select
 
 from app.security import get_password_hash, verify_password
-from app.models import User, UserCreate
+from app.models import User, UserCreate, UserUpdate
+from app.api.depdendancies import CurrentUser
 
 
 def create_user(session: Session, user_create: UserCreate) -> User:
@@ -18,7 +19,24 @@ def create_user(session: Session, user_create: UserCreate) -> User:
     session.refresh(db_user)
     return db_user
 
-# TODO: update_user
+
+def update_user(session: Session, current_user: CurrentUser, user_update: UserUpdate) -> User:
+    new_data = user_update.model_dump(exclude_unset=True)
+
+    current_user.sqlmodel_update(new_data)
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+    return current_user
+
+
+def delete_user(session: Session,  user_id: uuid.UUID | str):
+    if isinstance(user_id, str):
+        user_id = uuid.UUID(user_id)
+
+    target_user = get_user_by_id(session, user_id)
+    session.delete(target_user)
+    session.commit()
 
 
 def get_user_by_id(session: Session, user_id: uuid.UUID | str):

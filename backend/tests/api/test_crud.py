@@ -4,7 +4,7 @@ Unit tests for backend.app.crud
 # pylint: disable=invalid-name, missing-function-docstring, import-error
 import uuid
 from sqlmodel import Session
-from app.models import UserCreate
+from app.models import UserCreate, UserUpdate
 from app import crud, security
 
 test_email = "foo@bar.com"
@@ -19,6 +19,22 @@ def test_create_user(session: Session):
 
     assert security.verify_password(
         test_password, created_user.hashed_password)
+
+
+def test_update_user(session: Session):
+    created_user = crud.create_user(session, test_user)
+    new_email = "foofoo@barbar.com"
+    new_data = UserUpdate(email=new_email)
+
+    crud.update_user(session, created_user, new_data)
+    assert created_user.email == new_email
+
+
+def test_delete_user(session: Session):
+    created_user = crud.create_user(session, test_user)
+
+    crud.delete_user(session, created_user.id)
+    assert crud.get_user_by_id(session, created_user.id) is None
 
 
 def test_get_user_by_id(session: Session):

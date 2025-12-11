@@ -56,6 +56,10 @@ class UserBase(SQLModel):
 
 class UserCreate(UserBase, use_enum_values=True):
     password: str = Field(min_length=8, max_length=128)
+    
+class UserUpdate(UserBase):
+    email: EmailStr | None
+    password: str | None = Field(default=None, min_length=8, max_length=128)
 
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)

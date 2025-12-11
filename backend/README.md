@@ -6,13 +6,17 @@
 
 1. Create login JSON payload `{"username": user_email,"password": user_password}`. Note the login credentials are `email:password`, but FastAPI security library uses Oauth2 password flow, which is why the payload key is `username` instead of `email`.
 2. POST the login payload to `/api/login/access-token`
-3. If login credentials are valid, the API generates and sends back a JWT token as a string
+3. If login credentials are valid, the API generates and sends back a JWT token as a string. Token is valid for 1 week (can be changed in `/backend/app/security.py`).
 4. Add the JWT token to API requests as a header: `Authorization: Bearer <token>`
 
 ### /api/users
 
-- `GET /api/users/me` Get user information for the **currently authenticated user**
-- `GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
+🔒 == requires valid access token
+
+- 🔒`GET /api/users/me` Get user information for the **currently authenticated user**
+- 🔒`PATCH /api/users/me` Update user information for the **currently authenticated user** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged.
+- 🔒`DELETE /api/users/me` Delete the **currently authenticated user**
+- 🔒`GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
 - `POST /api/users/signup` **Register a new user account** by sending a POST request with a JSON payload matching the pydantic model `UserCreate` (see `/backend/app/models.py` for details)
 
 ### /api/pdfs

@@ -9,12 +9,12 @@ from passlib.context import CryptContext
 
 ALGORITHM = "HS256"
 SECRET_KEY = str(os.environ.get("SECRET_KEY", 'NO SECRET_KEY IN ENVIRONMENT'))
-DEFAULT_EXPIRATION = timedelta(weeks=1)
+EXPIRATION = timedelta(weeks=1)
 
 cc = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_jwt_token(subject: str | Any, expires_delta: timedelta = DEFAULT_EXPIRATION) -> str:
+def create_jwt_token(subject: str | Any, expires_delta: timedelta = EXPIRATION) -> str:
     expire = datetime.now(timezone.utc) + expires_delta
     encoded_jwt = jwt.encode(payload={"expiration": expire.isoformat(), "subject": str(subject)},
                              key=SECRET_KEY,
