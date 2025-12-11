@@ -33,7 +33,7 @@ const Login = () => {
 
       mockValidateToken(token).then((isValid) => {
         if (isValid) {
-          setUser({ username: 'admin', token });
+          setUser({ username: 'admin', token, role: 'admin' });
         } else {
           StorageManager.getInstance().removeItem('auth_token');
           setUser(null);

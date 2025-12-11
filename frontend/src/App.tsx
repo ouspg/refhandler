@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import ReviewPaper from './pages/ReviewPaper/ReviewPaper';
 import UserManagement from './pages/UserManagement/UserManagement';
 import ProjectManagement from './pages/ProjectManagement/ProjectManagement';
+import ProtectedRoute from './components/routes/protectedRoute';
 
 function App() {
   const { user } = useUserStore();
@@ -20,9 +21,9 @@ function App() {
           <NavBar />
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="/project-management" element={<ProjectManagement />} />
-            <Route path="/reviewpage/:id" element={<ReviewPaper />} />
+            <Route path="/user-management" element={<ProtectedRoute allowedRoles={['admin']} requireAuth={true}>{<UserManagement />}</ProtectedRoute>} />
+            <Route path="/project-management" element={<ProtectedRoute allowedRoles={['admin']} requireAuth={true}><ProjectManagement /></ProtectedRoute>} />
+            <Route path="/reviewpage/:id" element={<ProtectedRoute allowedRoles={['admin']} requireAuth={true}><ReviewPaper /></ProtectedRoute>} />
             <Route path="*" element={<h1>404 - Not Found</h1>} />
           </Routes>
         </>

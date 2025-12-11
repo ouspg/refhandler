@@ -19,16 +19,17 @@ const sampleItems: Item[] = [
 
 type ItemManagementProps = {
   pageName: string;
+  onAdd: () => void;
 };
 
-const ItemManagement: React.FC<ItemManagementProps> = ({ pageName }) => {
+const ItemManagement: React.FC<ItemManagementProps> = ({ pageName, onAdd }) => {
   const items = sampleItems;
 
   return (
     <div style={styles.page}>
       <div style={styles.headerRow}>
         <h2 style={styles.title}>{pageName} Management</h2>
-        <button style={styles.addButton} aria-label="Add Item">
+        <button style={styles.addButton} aria-label="Add Item" onClick={onAdd}>
           + Add {pageName}
         </button>
       </div>
