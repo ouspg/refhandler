@@ -10,6 +10,7 @@ from app.db import init_db
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
+ENVIRONMENT = os.environ.get("ENVIRONMENT", 'NO ENVIRONMENT IN ENVIRONMENT')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
@@ -34,9 +35,16 @@ api_router.include_router(login.router, prefix="/login", tags=["Login"])
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
 
 # Initialize app and include api router with /api prefix
-app = FastAPI(docs_url='/api/docs',
-                redoc_url='/api/redoc',
-                openapi_url='/api/openapi.json')
+if ENVIRONMENT == "production":
+    # Disables Swagger UI
+    app = FastAPI(docs_url=None,
+                redoc_url=None,
+                openapi_url=None)
+else:
+    app = FastAPI(docs_url='/api/docs',
+                    redoc_url='/api/redoc',
+                    openapi_url='/api/openapi.json')
+
 app.include_router(api_router, prefix="/api")
 
 # Set all CORS enabled origins
