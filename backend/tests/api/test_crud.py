@@ -33,7 +33,7 @@ def test_update_user(session: Session):
 def test_delete_user(session: Session):
     created_user = crud.create_user(session, test_user)
 
-    crud.delete_user(session, created_user.id)
+    crud.delete_user(session, created_user)
     assert crud.get_user_by_id(session, created_user.id) is None
 
 

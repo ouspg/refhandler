@@ -1,5 +1,5 @@
 """
-create, read, update, and delete (CRUD) users for the database
+Database operations for (CRUD) creating, reading, updating and deleting users
 
 Based on: 
 https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/crud.py
@@ -12,10 +12,9 @@ from sqlmodel import Session, select
 
 from app.security import get_password_hash, verify_password
 from app.models import User, UserCreate, UserUpdate, UserRole
-from app.api.depdendancies import CurrentUser
 
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", 'NO ADMIN_EMAIL IN ENVIRONMENT')
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", 'NO ADMIN_PASSWORD IN ENVIRONMENT')
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 
 def create_user(session: Session, user_create: UserCreate) -> User:
@@ -35,21 +34,17 @@ def create_default_admin(session: Session) -> User:
     return create_user(session, admin_user)
 
 
-def update_user(session: Session, current_user: CurrentUser, user_update: UserUpdate) -> User:
+def update_user(session: Session, target_user: User, user_update: UserUpdate) -> User:
     new_data = user_update.model_dump(exclude_unset=True)
 
-    current_user.sqlmodel_update(new_data)
-    session.add(current_user)
+    target_user.sqlmodel_update(new_data)
+    session.add(target_user)
     session.commit()
-    session.refresh(current_user)
-    return current_user
+    session.refresh(target_user)
+    return target_user
 
 
-def delete_user(session: Session,  user_id: uuid.UUID | str):
-    if isinstance(user_id, str):
-        user_id = uuid.UUID(user_id)
-
-    target_user = get_user_by_id(session, user_id)
+def delete_user(session: Session,  target_user: User):
     session.delete(target_user)
     session.commit()
 

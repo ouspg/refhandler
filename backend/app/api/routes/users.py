@@ -1,15 +1,16 @@
 """
 API definitions for /api/users
 
-If the API function has 'current_user: CurrentUser' as an argument,
+If the API function has types CurrentUser or CurrentAdmin as an argument,
 using the API endpoint requires a valid access token header
+
 (see API documentation in /backend/README.md for details)
 """
 # pylint: disable=import-error, missing-function-docstring, missing-module-docstring, unused-argument
 from fastapi import APIRouter, HTTPException
 
 from app import crud
-from app.api.depdendancies import SessionDep, CurrentUser
+from app.api.depdendancies import SessionDep, CurrentUser, CurrentAdmin
 from app.models import UserCreate, UserUpdate, UserRole
 
 router = APIRouter()
@@ -39,7 +40,7 @@ async def delete_user_me(session: SessionDep, current_user: CurrentUser):
     if current_user.role == UserRole.admin:
         raise HTTPException(403, "Admin users shouldn't be deleted")
 
-    crud.delete_user(session, current_user.id)
+    crud.delete_user(session, current_user)
     return {"message": f"User {current_user.email} deleted sucessfully"}
 
 
@@ -56,28 +57,32 @@ async def get_user(session: SessionDep, current_user: CurrentUser, user_id: str)
 
 # Update user with UUID user_id (Admin only)
 @router.patch("/{user_id}")
-async def update_user(session: SessionDep, current_user: CurrentUser,
+async def update_user(session: SessionDep, current_admin: CurrentAdmin,
                     user_update: UserUpdate, user_id: str):
-    if current_user.role != UserRole.admin:
-        raise HTTPException(403, "Only Admin users can patch other users")
 
+    target_user = crud.get_user_by_id(session, user_id)
+    if target_user is None:
+        raise HTTPException(404, "User not found")
+    
     if user_update.email:
         existing_user = crud.get_user_by_email(session, user_update.email)
-        if existing_user and existing_user.id != current_user.id:
+        if existing_user and existing_user.id != target_user.id:
             raise HTTPException(409, f"User with email {user_update.email} already exits")
 
-    updated_user = crud.update_user(session, current_user, user_update)
+    updated_user = crud.update_user(session, target_user, user_update)
     return updated_user
 
 
 # Delete user with UUID user_id (Admin only)
 @router.delete("/{user_id}")
-async def delete_user(session: SessionDep, current_user: CurrentUser, user_id: str):
-    if current_user.role != UserRole.admin:
-        raise HTTPException(403, "Only Admin users can delete other users")
+async def delete_user(session: SessionDep, current_admin: CurrentAdmin, user_id: str):
 
-    crud.delete_user(session, user_id)
-    return {"message": f"User {current_user.email} deleted sucessfully"}
+    target_user = crud.get_user_by_id(session, user_id)
+    if target_user is None:
+        raise HTTPException(404, "User not found")
+
+    crud.delete_user(session, target_user)
+    return {"message": f"User {target_user.email} deleted sucessfully"}
 
 
 # Register new user account
