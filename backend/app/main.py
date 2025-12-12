@@ -1,13 +1,16 @@
+# pylint: disable=import-error, missing-function-docstring, missing-module-docstring
+import os
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
-import os
 from fastapi import APIRouter
-from app.api.routes import pdfs
+from starlette.middleware.cors import CORSMiddleware
+
+from app.api.routes import pdfs, login, users
 from app.db import init_db
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
+ENVIRONMENT = os.environ.get("ENVIRONMENT", 'NO ENVIRONMENT IN ENVIRONMENT')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
@@ -28,11 +31,20 @@ for p in EXTRA_ALLOWED_ORIGIN_PORTS:
 # Combine all routers into one API router
 api_router = APIRouter()
 api_router.include_router(pdfs.router, prefix="/pdfs", tags=["Pdfs"])
+api_router.include_router(login.router, prefix="/login", tags=["Login"])
+api_router.include_router(users.router, prefix="/users", tags=["Users"])
 
 # Initialize app and include api router with /api prefix
-app = FastAPI(docs_url='/api/docs',
-                redoc_url='/api/redoc',
-                openapi_url='/api/openapi.json')
+if ENVIRONMENT == "production":
+    # Disables Swagger UI
+    app = FastAPI(docs_url=None,
+                redoc_url=None,
+                openapi_url=None)
+else:
+    app = FastAPI(docs_url='/api/docs',
+                    redoc_url='/api/redoc',
+                    openapi_url='/api/openapi.json')
+
 app.include_router(api_router, prefix="/api")
 
 # Set all CORS enabled origins
@@ -43,6 +55,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 if __name__ == "__main__":
     init_db()

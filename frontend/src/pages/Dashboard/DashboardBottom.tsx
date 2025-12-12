@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './DashboardBottom.css';
+
+// needed for error TS7016: Could not find a declaration file for module
+// @ts-ignore
 import papersService from '../service/papers';
 
 const RecentPapers: React.FC = () => {

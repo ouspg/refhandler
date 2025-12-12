@@ -1,5 +1,13 @@
+"""
+Contains SQLModel data structures for:
+- defining database tables (models with table=True)
+- validating incoming JSON objects at API endpoints
+"""
+# pylint: disable=missing-function-docstring, missing-class-docstring, invalid-name
 import uuid
-from sqlmodel import Field, SQLModel, Relationship
+import enum
+from sqlmodel import Field, SQLModel, Relationship, Enum, Column
+from pydantic import EmailStr
 
 ##############################################
 # WARNING
@@ -8,13 +16,18 @@ from sqlmodel import Field, SQLModel, Relationship
 # /backend/README.md#Running database migrations with alembic
 ##############################################
 
+
 class VirusScanResult(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    pdf: "Pdf" = Relationship(back_populates="scan_results", sa_relationship_kwargs={'uselist': False})
+    pdf: "Pdf" = Relationship(
+        back_populates="scan_results",
+        sa_relationship_kwargs={'uselist': False})
     scan_results: str
 
 # Pdf database table model
+
+
 class Pdf(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True)
     original_filename: str
@@ -24,15 +37,50 @@ class Pdf(SQLModel, table=True):
     scan_results: VirusScanResult = Relationship(back_populates="pdf")
 
 # For receiving pdf metadata
+
+
 class PdfCreate(SQLModel):
     id: uuid.UUID
     original_filename: str
     uploaded_by: int | None = None
 
 # for sending pdf metadata
+
+
 class PdfPublic(SQLModel):
     id: uuid.UUID
     original_filename: str
     uploaded_by: int | None
     parsed: bool = False
     scan_results: VirusScanResult
+
+
+class UserRole(str, enum.Enum):
+    admin = "admin"
+    manager = "manager"
+    user = "user"
+
+
+class UserBase(SQLModel):
+    firstName: str | None = None
+    middleName: str | None = None
+    lastName: str | None = None
+    email: EmailStr = Field(unique=True, index=True)
+    phone: str | None = None
+    status: str | None = None
+    role: UserRole = Field(default=UserRole.user,
+                           sa_column=Column(Enum(UserRole)))
+
+
+class UserCreate(UserBase, use_enum_values=True):
+    password: str = Field(min_length=8, max_length=128)
+
+
+class UserUpdate(UserBase):
+    email: EmailStr | None
+    password: str | None = Field(default=None, min_length=8, max_length=128)
+
+
+class User(UserBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    hashed_password: str
