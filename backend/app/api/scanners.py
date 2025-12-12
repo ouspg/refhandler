@@ -55,6 +55,7 @@ class Scanners:
         results = parse_virustotal_response(response)
 
         # Determine if file is malicious based on scan results
+        # Determine if file is malicious based on scan results
         malicious, suspicious = results["malicious"], results["suspicious"]
         if malicious > 2:
             return {
@@ -104,6 +105,7 @@ Example Virustotal API response
   "type-unsupported": 4
 }
 """
+
 def parse_virustotal_response(response: requests.models.Response):
     data = response.json()
 
