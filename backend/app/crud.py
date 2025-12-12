@@ -7,11 +7,15 @@ https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e
 # pylint: disable=import-error, missing-function-docstring, line-too-long, fixme
 
 import uuid
+import os
 from sqlmodel import Session, select
 
 from app.security import get_password_hash, verify_password
-from app.models import User, UserCreate, UserUpdate
+from app.models import User, UserCreate, UserUpdate, UserRole
 from app.api.depdendancies import CurrentUser
+
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", 'NO ADMIN_EMAIL IN ENVIRONMENT')
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", 'NO ADMIN_PASSWORD IN ENVIRONMENT')
 
 
 def create_user(session: Session, user_create: UserCreate) -> User:
@@ -23,6 +27,12 @@ def create_user(session: Session, user_create: UserCreate) -> User:
     session.commit()
     session.refresh(db_user)
     return db_user
+
+
+def create_default_admin(session: Session) -> User:
+    admin_user = UserCreate(role=UserRole.admin, email=ADMIN_EMAIL, password=ADMIN_PASSWORD)
+
+    return create_user(session, admin_user)
 
 
 def update_user(session: Session, current_user: CurrentUser, user_update: UserUpdate) -> User:

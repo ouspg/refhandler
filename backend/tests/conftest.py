@@ -2,15 +2,11 @@
 Contains pytest fixtures that are used for other tests.
 Used to override dependancies such as Postges with unit-testable mockups.
 """
-# pylint: disable=missing-function-docstring
+# pylint: disable=missing-function-docstring, import-outside-toplevel
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
-
-from app.main import app
-from app.api.depdendancies import get_session
-
 
 
 # Mock database with sqlite in-memory database
@@ -26,6 +22,10 @@ def session_fixture():
 # Inject mock database into app for test client
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
+    # Imports moved here to avoid circular import error
+    from app.api.depdendancies import get_session
+    from app.main import app
+
     def get_session_override():
         return session
     app.dependency_overrides[get_session] = get_session_override
