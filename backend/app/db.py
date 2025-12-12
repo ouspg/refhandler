@@ -1,6 +1,7 @@
-
-from sqlmodel import Session, SQLModel, create_engine
+# pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long
 from os import environ
+from sqlmodel import SQLModel, create_engine
+
 
 POSTGRES_USER = environ.get("POSTGRES_USER", 'NO POSTGRES_USER IN ENVIRONMENT')
 POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD", 'NO POSTGRES_PASSWORD IN ENVIRONMENT')
@@ -9,7 +10,9 @@ POSTGRES_SERVER = environ.get("POSTGRES_SERVER", 'NO POSTGRES_SERVER IN ENVIRONM
 POSTGRES_PORT = environ.get("POSTGRES_PORT", 'NO POSTGRES_PORT IN ENVIRONMENT')
 POSTGRES_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
+
 engine = create_engine(POSTGRES_URL)
+
 
 def init_db():
     SQLModel.metadata.create_all(bind=engine)

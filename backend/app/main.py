@@ -1,8 +1,10 @@
+# pylint: disable=import-error, missing-function-docstring, missing-module-docstring
+import os
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
-import os
 from fastapi import APIRouter
+from starlette.middleware.cors import CORSMiddleware
+
 from app.api.routes import pdfs, login, users
 from app.db import init_db
 
@@ -33,6 +35,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 if __name__ == "__main__":
     init_db()

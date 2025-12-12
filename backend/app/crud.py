@@ -1,5 +1,10 @@
-# pylint: disable=import-error, missing-function-docstring, missing-module-docstring, line-too-long, fixme
-# Based on: https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/crud.py
+"""
+create, read, update, and delete (CRUD) users for the database
+
+Based on: 
+https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/crud.py
+"""
+# pylint: disable=import-error, missing-function-docstring, line-too-long, fixme
 
 import uuid
 from sqlmodel import Session, select
