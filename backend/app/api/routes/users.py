@@ -6,12 +6,12 @@ using the API endpoint requires a valid access token header
 
 (see API documentation in /backend/README.md for details)
 """
-# pylint: disable=import-error, missing-function-docstring, missing-module-docstring, unused-argument
+# pylint: disable=missing-function-docstring, missing-module-docstring, unused-argument
 from fastapi import APIRouter, HTTPException
 
-from app import crud
-from app.api.depdendancies import SessionDep, CurrentUser, CurrentAdmin
-from app.models import UserCreate, UserUpdate, UserRole
+from backend.app.api import user_crud
+from backend.app.api.depdendancies import SessionDep, CurrentUser, CurrentAdmin
+from backend.app.models import UserCreate, UserUpdate, UserRole
 
 router = APIRouter()
 
@@ -26,11 +26,11 @@ async def get_user_me(current_user: CurrentUser):
 @router.patch("/me")
 async def update_user_me(session: SessionDep, current_user: CurrentUser, user_update: UserUpdate):
     if user_update.email:
-        existing_user = crud.get_user_by_email(session, user_update.email)
+        existing_user = user_crud.get_user_by_email(session, user_update.email)
         if existing_user and existing_user.id != current_user.id:
             raise HTTPException(409, f"User with email {user_update.email} already exits")
 
-    updated_user = crud.update_user(session, current_user, user_update)
+    updated_user = user_crud.update_user(session, current_user, user_update)
     return updated_user
 
 
@@ -40,14 +40,14 @@ async def delete_user_me(session: SessionDep, current_user: CurrentUser):
     if current_user.role == UserRole.admin:
         raise HTTPException(403, "Admin users shouldn't be deleted")
 
-    crud.delete_user(session, current_user)
+    user_crud.delete_user(session, current_user)
     return {"message": f"User {current_user.email} deleted sucessfully"}
 
 
 # Get user with UUID user_id
 @router.get("/{user_id}")
 async def get_user(session: SessionDep, current_user: CurrentUser, user_id: str):
-    user = crud.get_user_by_id(session, user_id)
+    user = user_crud.get_user_by_id(session, user_id)
 
     if not user:
         raise HTTPException(404, "User not found")
@@ -60,16 +60,16 @@ async def get_user(session: SessionDep, current_user: CurrentUser, user_id: str)
 async def update_user(session: SessionDep, current_admin: CurrentAdmin,
                     user_update: UserUpdate, user_id: str):
 
-    target_user = crud.get_user_by_id(session, user_id)
+    target_user = user_crud.get_user_by_id(session, user_id)
     if target_user is None:
         raise HTTPException(404, "User not found")
     
     if user_update.email:
-        existing_user = crud.get_user_by_email(session, user_update.email)
+        existing_user = user_crud.get_user_by_email(session, user_update.email)
         if existing_user and existing_user.id != target_user.id:
             raise HTTPException(409, f"User with email {user_update.email} already exits")
 
-    updated_user = crud.update_user(session, target_user, user_update)
+    updated_user = user_crud.update_user(session, target_user, user_update)
     return updated_user
 
 
@@ -77,11 +77,11 @@ async def update_user(session: SessionDep, current_admin: CurrentAdmin,
 @router.delete("/{user_id}")
 async def delete_user(session: SessionDep, current_admin: CurrentAdmin, user_id: str):
 
-    target_user = crud.get_user_by_id(session, user_id)
+    target_user = user_crud.get_user_by_id(session, user_id)
     if target_user is None:
         raise HTTPException(404, "User not found")
 
-    crud.delete_user(session, target_user)
+    user_crud.delete_user(session, target_user)
     return {"message": f"User {target_user.email} deleted sucessfully"}
 
 
@@ -89,11 +89,11 @@ async def delete_user(session: SessionDep, current_admin: CurrentAdmin, user_id:
 @router.post("/signup")
 async def register_user(session: SessionDep, new_user: UserCreate):
 
-    existing_user = crud.get_user_by_email(session, new_user.email)
+    existing_user = user_crud.get_user_by_email(session, new_user.email)
 
     if existing_user:
         raise HTTPException(400, "User with given email alrady exists")
 
     userCreate = UserCreate.model_validate(new_user)
-    user = crud.create_user(session, userCreate)
+    user = user_crud.create_user(session, userCreate)
     return user

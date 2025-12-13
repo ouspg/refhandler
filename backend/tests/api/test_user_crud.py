@@ -4,8 +4,9 @@ Unit tests for backend.app.crud
 # pylint: disable=invalid-name, missing-function-docstring, import-error
 import uuid
 from sqlmodel import Session
-from app.models import UserCreate, UserUpdate
-from app import crud, security
+from backend.app.models import UserCreate, UserUpdate
+from backend.app import security
+from backend.app.api import user_crud
 
 test_email = "foo@bar.com"
 test_password = "foobarbaz"
@@ -13,7 +14,7 @@ test_user = UserCreate(email=test_email, password=test_password)
 
 
 def test_create_user(session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
     assert created_user.email == test_email
     assert isinstance(created_user.id, uuid.UUID)
 
@@ -22,56 +23,56 @@ def test_create_user(session: Session):
 
 
 def test_update_user(session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
     new_email = "foofoo@barbar.com"
     new_data = UserUpdate(email=new_email)
 
-    crud.update_user(session, created_user, new_data)
+    user_crud.update_user(session, created_user, new_data)
     assert created_user.email == new_email
 
 
 def test_delete_user(session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
 
-    crud.delete_user(session, created_user)
-    assert crud.get_user_by_id(session, created_user.id) is None
+    user_crud.delete_user(session, created_user)
+    assert user_crud.get_user_by_id(session, created_user.id) is None
 
 
 def test_get_user_by_id(session: Session):
-    created_user = crud.create_user(session, test_user)
-    user_by_id = crud.get_user_by_id(session, created_user.id)
+    created_user = user_crud.create_user(session, test_user)
+    user_by_id = user_crud.get_user_by_id(session, created_user.id)
 
     assert user_by_id == created_user
 
 
 def test_get_user_by_email(session: Session):
-    created_user = crud.create_user(session, test_user)
-    user_by_email = crud.get_user_by_email(session, test_email)
+    created_user = user_crud.create_user(session, test_user)
+    user_by_email = user_crud.get_user_by_email(session, test_email)
 
     assert user_by_email == created_user
 
 
 def test_authenticate_user(session: Session):
-    created_user = crud.create_user(session, test_user)
-    authenticated_user = crud.authenticate_user(
+    created_user = user_crud.create_user(session, test_user)
+    authenticated_user = user_crud.authenticate_user(
         session, test_email, test_password)
 
     assert authenticated_user is created_user
 
 
 def test_authenticate_user_invalid_email(session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     invalid_email = "invalid@bar.com"
-    authenticated_user = crud.authenticate_user(
+    authenticated_user = user_crud.authenticate_user(
         session, invalid_email, test_password)
 
     assert authenticated_user is None
 
 
 def test_authenticate_user_invalid_password(session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     invalid_password = "invalid"
-    authenticated_user = crud.authenticate_user(
+    authenticated_user = user_crud.authenticate_user(
         session, test_email, invalid_password)
 
     assert authenticated_user is None

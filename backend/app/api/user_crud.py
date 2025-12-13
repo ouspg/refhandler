@@ -10,8 +10,8 @@ import uuid
 import os
 from sqlmodel import Session, select
 
-from app.security import get_password_hash, verify_password
-from app.models import User, UserCreate, UserUpdate, UserRole
+from backend.app.security import get_password_hash, verify_password
+from backend.app.models import User, UserCreate, UserUpdate, UserRole
 
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")

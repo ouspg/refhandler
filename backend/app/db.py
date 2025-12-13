@@ -1,7 +1,7 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long, import-error
 import os
 from sqlmodel import SQLModel, create_engine, Session
-from app import crud
+from backend.app.api import user_crud
 
 
 POSTGRES_USER = os.environ.get("POSTGRES_USER", 'NO POSTGRES_USER IN ENVIRONMENT')
@@ -22,5 +22,5 @@ def init_db():
 
     with Session(engine) as session:
         # Create default admin account if it doesn't exist yet
-        if crud.get_user_by_email(session, ADMIN_EMAIL) is None:
-            crud.create_default_admin(session)
+        if user_crud.get_user_by_email(session, ADMIN_EMAIL) is None:
+            user_crud.create_default_admin(session)

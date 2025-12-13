@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from fastapi import APIRouter
 from starlette.middleware.cors import CORSMiddleware
 
-from app.api.routes import pdfs, login, users
-from app.db import init_db
+from backend.app.api.routes import login, users, pdfs
+from backend.app.db import init_db
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))

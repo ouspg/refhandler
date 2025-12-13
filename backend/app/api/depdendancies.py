@@ -18,10 +18,10 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlmodel import Session
 import jwt
 
-from app.db import engine
-from app.api.scanners import Scanners
-from app.models import User, UserRole
-from app import security
+from backend.app.db import engine
+from backend.app.api.scanners import Scanners
+from backend.app.models import User, UserRole
+from backend.app import security
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl="/api/login/access-token"

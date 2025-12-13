@@ -6,8 +6,8 @@ import uuid
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.models import UserCreate, UserUpdate, UserRole
-from app import crud
+from backend.app.models import UserCreate, UserUpdate, UserRole
+from backend.app.api import user_crud
 
 
 test_email = "foo@bar.com"
@@ -32,7 +32,7 @@ def _get_access_token_header(client: TestClient, username: str, password: str):
 
 
 def test_get_users_me(client: TestClient, session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
 
     # Get current user from api
@@ -41,7 +41,7 @@ def test_get_users_me(client: TestClient, session: Session):
 
 
 def test_get_users_me_invalid_token(client: TestClient, session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     token = "invalid"
     token_header = {"Authorization": f"Bearer {token}"}
 
@@ -51,7 +51,7 @@ def test_get_users_me_invalid_token(client: TestClient, session: Session):
 
 
 def test_update_users_me(client: TestClient, session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
     new_email = "foofoo@barbar.com"
     new_data = UserUpdate(email=new_email)
@@ -63,8 +63,8 @@ def test_update_users_me(client: TestClient, session: Session):
 
 
 def test_update_users_me_email_in_use(client: TestClient, session: Session):
-    user1 = crud.create_user(session, UserCreate(email=test_email, password=test_password))
-    user2 = crud.create_user(session, UserCreate(
+    user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
     user1_token_header = _get_access_token_header(client, test_email, test_password)
 
@@ -77,7 +77,7 @@ def test_update_users_me_email_in_use(client: TestClient, session: Session):
 
 
 def test_delete_users_me(client: TestClient, session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
 
     # Delete current user
@@ -91,7 +91,7 @@ def test_delete_users_me(client: TestClient, session: Session):
 
 
 def test_get_users(client: TestClient, session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
 
     # Get user with user id
@@ -103,7 +103,7 @@ def test_get_users(client: TestClient, session: Session):
 
 
 def test_get_users_invalid_token(client: TestClient, session: Session):
-    created_user = crud.create_user(session, test_user)
+    created_user = user_crud.create_user(session, test_user)
     token = "invalid"
     token_header = {"Authorization": f"Bearer {token}"}
 
@@ -114,7 +114,7 @@ def test_get_users_invalid_token(client: TestClient, session: Session):
 
 
 def test_get_users_invalid_id(client: TestClient, session: Session):
-    crud.create_user(session, test_user)
+    user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
 
     # Get user with user id that doesn't exist in the database
@@ -124,8 +124,8 @@ def test_get_users_invalid_id(client: TestClient, session: Session):
 
 
 def test_update_user_by_admin(client: TestClient, session: Session):
-    created_user = crud.create_user(session, test_user)
-    crud.create_user(session, test_admin)
+    created_user = user_crud.create_user(session, test_user)
+    user_crud.create_user(session, test_admin)
     admin_token_header = _get_access_token_header(
         client, test_admin.email, test_admin.password)
     new_email = "new@email.com"
@@ -142,8 +142,8 @@ def test_update_user_by_admin(client: TestClient, session: Session):
 
 
 def test_update_user_by_other_user(client: TestClient, session: Session):
-    user1 = crud.create_user(session, UserCreate(email=test_email, password=test_password))
-    user2 = crud.create_user(session, UserCreate(
+    user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
     user1_token_header = _get_access_token_header(client, test_email, test_password)
 
@@ -157,8 +157,8 @@ def test_update_user_by_other_user(client: TestClient, session: Session):
 
 
 def test_delete_user_by_admin(client: TestClient, session: Session):
-    created_user = crud.create_user(session, test_user)
-    crud.create_user(session, test_admin)
+    created_user = user_crud.create_user(session, test_user)
+    user_crud.create_user(session, test_admin)
     admin_token_header = _get_access_token_header(
         client, test_admin.email, test_admin.password)
 
@@ -166,12 +166,12 @@ def test_delete_user_by_admin(client: TestClient, session: Session):
     api_string = f"/api/users/{created_user.id}"
     response = client.delete(api_string, headers=admin_token_header)
     assert response.status_code == 200
-    assert crud.get_user_by_id(session, created_user.id) is None
+    assert user_crud.get_user_by_id(session, created_user.id) is None
 
 
 def test_delete_user_by_other_user(client: TestClient, session: Session):
-    user1 = crud.create_user(session, UserCreate(email=test_email, password=test_password))
-    user2 = crud.create_user(session, UserCreate(
+    user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
     user1_token_header = _get_access_token_header(client, test_email, test_password)
 
@@ -179,7 +179,7 @@ def test_delete_user_by_other_user(client: TestClient, session: Session):
     api_string = f"/api/users/{user2.id}"
     response = client.delete(api_string, headers=user1_token_header)
     assert response.status_code == 403
-    assert crud.get_user_by_id(session, user2.id) is not None
+    assert user_crud.get_user_by_id(session, user2.id) is not None
 
 
 def test_signup(client: TestClient):

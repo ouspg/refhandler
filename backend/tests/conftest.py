@@ -7,7 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
-
+from backend.app.api.depdendancies import get_session
+from backend.app.main import app
 
 # Mock database with sqlite in-memory database
 @pytest.fixture(name="session")
@@ -23,8 +24,7 @@ def session_fixture():
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
     # Imports moved here to avoid circular import error
-    from app.api.depdendancies import get_session
-    from app.main import app
+
 
     def get_session_override():
         return session

@@ -18,41 +18,36 @@ from pydantic import EmailStr
 
 
 class VirusScanResult(SQLModel, table=True):
-
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     pdf: "Pdf" = Relationship(
-        back_populates="scan_results",
+        back_populates="scan_result",
         sa_relationship_kwargs={'uselist': False})
     scan_results: str
 
-# Pdf database table model
-
-
-class Pdf(SQLModel, table=True):
-    id: uuid.UUID = Field(primary_key=True)
-    original_filename: str
-    uploaded_by: int | None = None
-    parsed: bool = False
-    scan_results_id: uuid.UUID | None = Field(foreign_key="virusscanresult.id")
-    scan_results: VirusScanResult = Relationship(back_populates="pdf")
 
 # For receiving pdf metadata
-
-
 class PdfCreate(SQLModel):
-    id: uuid.UUID
     original_filename: str
-    uploaded_by: int | None = None
+    content_hash: str
+    uploaded_by: uuid.UUID = Field(foreign_key="user.id")
+    scan_result_id: uuid.UUID = Field(foreign_key="virusscanresult.id")
+
+# Pdf database table model
+class Pdf(PdfCreate, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    parsed: bool = False
+    scan_result_id: uuid.UUID = Field(foreign_key="virusscanresult.id")
+    scan_result: VirusScanResult = Relationship(back_populates="pdf")
+
+
 
 # for sending pdf metadata
-
-
 class PdfPublic(SQLModel):
     id: uuid.UUID
     original_filename: str
-    uploaded_by: int | None
-    parsed: bool = False
-    scan_results: VirusScanResult
+    uploaded_by: uuid.UUID
+    parsed: bool
+    scan_result: VirusScanResult
 
 
 class UserRole(str, enum.Enum):
