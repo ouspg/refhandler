@@ -35,10 +35,10 @@ services:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
     - pdf_uploads:/pdf_uploads
-    - ./backend/alembic.ini:/app/alembic.ini
-    - ./backend/alembic/:/app/alembic
+    - ./backend/alembic.ini:/src/backend/alembic.ini
+    - ./backend/alembic/:/src/backend/alembic
     post_start:
-    - command: sh -c "alembic upgrade head"
+    - command: sh -c "alembic -c /src/backend/alembic.ini upgrade head"
     restart: unless-stopped
 
   postgres:
