@@ -4,7 +4,7 @@ Database and filesystem operations for (CRUD) creating, reading, updating and de
 Based on: 
 https://github.com/fastapi/full-stack-fastapi-template/blob/e4022a9502a6b61c857e3cbdaddc69e7219c9d53/backend/app/crud.py
 """
-# pylint: disable=import-error, missing-function-docstring, line-too-long, fixme
+# pylint: disable=missing-function-docstring, line-too-long, fixme
 
 import uuid
 import os
@@ -40,9 +40,11 @@ def delete_pdf(session: Session,  target_pdf: Pdf):
     session.commit()
 
 
-def get_pdf_by_id(session: Session, pdf_id: uuid.UUID | str):
-    if isinstance(pdf_id, str):
-        pdf_id = uuid.UUID(pdf_id)
+def get_pdf_by_id(session: Session, pdf_id_in: str):
+    try:
+        pdf_id = uuid.UUID(pdf_id_in)
+    except ValueError:
+        return None
 
     db_pdf = session.get(Pdf, pdf_id)
     return db_pdf

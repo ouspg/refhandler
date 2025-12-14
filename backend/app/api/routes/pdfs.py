@@ -1,4 +1,4 @@
-# pylint: disable=import-error, missing-function-docstring, missing-module-docstring, missing-class-docstring, unused-variable, fixme, unused-argument
+# pylint: disable=missing-function-docstring, missing-module-docstring, missing-class-docstring, unused-variable, fixme, unused-argument
 import os
 from fastapi import UploadFile, APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response
@@ -9,20 +9,27 @@ from backend.app.api.scanners import get_sha256_hash
 from backend.app.models import PdfCreate, PdfPublic, UserRole
 
 
-
 router = APIRouter()
 
 
 @router.get("/{file_id}")
-async def get_pdf(session: SessionDep, current_user: CurrentUser, file_id: str):
+async def get_pdf_file(session: SessionDep, current_user: CurrentUser, file_id: str):
+    # If file_id doesn't end in .pdf, get the pdf entry from database
+    if file_id[-4:] != ".pdf":
+        db_pdf = pdf_crud.get_pdf_by_id(session, file_id)
+        if db_pdf is None:
+            raise HTTPException(404, "Pdf file not found in database")
+        return db_pdf
+
+    # file_id ended in .pdf, get the pdf file from disk
+    file_id = file_id[:-4]
     file_path = pdf_crud.get_file_path(file_id)
     db_pdf = pdf_crud.get_pdf_by_id(session, file_id)
-    if file_path and db_pdf:
-        header = {"Content-Type": "application/pdf"}
-        return FileResponse(file_path, filename=db_pdf.original_filename, headers=header)
-    else:
-        raise HTTPException(404, "File not found")
+    if file_path is None or db_pdf is None:
+        raise HTTPException(404, "Pdf file not found on disk")
 
+    header = {"Content-Type": "application/pdf"}
+    return FileResponse(file_path, filename=db_pdf.original_filename, headers=header)
 
 @router.post("/", response_model=PdfPublic)
 async def upload_pdf(session: SessionDep, scanners: ScannersDep,

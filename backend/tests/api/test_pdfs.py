@@ -1,11 +1,11 @@
 """
 Unit tests for /api/pdfs
 """
-# pylint: disable=invalid-name, missing-function-docstring, import-error
+# pylint: disable=missing-function-docstring
 from fastapi.testclient import TestClient
 from httpx import Response
 from sqlmodel import Session
-from backend.app.models import UserCreate, UserRole
+from backend.app.models import UserCreate, UserRole, PdfPublic
 from backend.app.api import user_crud
 
 
@@ -31,7 +31,7 @@ def _get_access_token_header(client: TestClient, username: str, password: str):
 def test_post_get_delete(session: Session, client: TestClient, mocker):
     created_user = user_crud.create_user(session, test_user)
     token_header = _get_access_token_header(client, test_email, test_password)
-    
+
     # Mock ClamAV scan result with safe file
     mocker.patch("backend.app.api.scanners.Scanners.clamav_scan",
                  return_value=Response(200, json={"results": "foobar"}))
@@ -42,24 +42,33 @@ def test_post_get_delete(session: Session, client: TestClient, mocker):
         # Upload test pdf file
         files={'pdf_file': pdf_file}
         response_post = client.post("/api/pdfs", files=files, headers=token_header)
-        
-        data = response_post.json()
+        db_pdf = PdfPublic.model_validate_json(response_post.text)
         assert response_post.status_code == 200
-        assert data["original_filename"] == "test.pdf"
-        assert data["uploaded_by"] == str(created_user.id)
+        assert db_pdf.original_filename == "test.pdf"
+        assert db_pdf.uploaded_by == created_user.id
+
+        # Try to upload the same file again
+        response_post_again = client.post("/api/pdfs", files=files, headers=token_header)
+        assert response_post_again.status_code == 409
 
         # Get uploaded test file from backend and compare contents with original
-        response_get = client.get(f"api/pdfs/{data["id"]}", headers=token_header)
+        response_get = client.get(f"api/pdfs/{db_pdf.id}.pdf", headers=token_header)
         pdf_file.seek(0)
         assert pdf_file.read() == response_get.content
         assert response_get.headers["content-type"] == "application/pdf"
+        
+        # Get the pdf object from database
+        response_get = client.get(f"api/pdfs/{db_pdf.id}", headers=token_header)
+        assert response_get.status_code == 200
 
         # remove uploaded test file
-        response_delete = client.delete(f"api/pdfs/{data["id"]}", headers=token_header)
+        response_delete = client.delete(f"api/pdfs/{db_pdf.id}", headers=token_header)
         assert response_delete.status_code == 200
 
         # Make sure file was removed
-        response_after_delete = client.get(f"api/pdfs/{data["id"]}", headers=token_header)
+        response_after_delete = client.get(f"api/pdfs/{db_pdf.id}.pdf", headers=token_header)
+        assert response_after_delete.status_code == 404
+        response_after_delete = client.get(f"api/pdfs/{db_pdf.id}", headers=token_header)
         assert response_after_delete.status_code == 404
 
 
@@ -91,3 +100,15 @@ def test_post_with_infected_mockup(session: Session, client: TestClient, mocker)
         response_post = client.post("/api/pdfs", files={'pdf_file': pdf_file},
                                     headers=token_header)
         assert response_post.status_code == 406
+
+
+def test_delete_invalid_id(session: Session, client: TestClient):
+    user_crud.create_user(session, test_user)
+    token_header = _get_access_token_header(client, test_email, test_password)
+
+    invalid_id = "invalid"
+    response_delete = client.delete(f"api/pdfs/{invalid_id}", headers=token_header)
+    assert response_delete.status_code == 404
+
+    response_delete = client.delete(f"api/pdfs/{invalid_id}.pdf", headers=token_header)
+    assert response_delete.status_code == 404
