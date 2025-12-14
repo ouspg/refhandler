@@ -1,4 +1,4 @@
-# pylint: disable=import-error, missing-function-docstring, missing-module-docstring, line-too-long
+# pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long
 # Based on: https://github.com/fastapi/full-stack-fastapi-template/blob/master/backend/app/core/security.py
 
 from datetime import datetime, timedelta, timezone

@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long, import-error
+# pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from backend.app.api import user_crud

@@ -1,7 +1,7 @@
 """
 Unit tests for /api/login/access-token
 """
-# pylint: disable=invalid-name, missing-function-docstring, import-error
+# pylint: disable=invalid-name, missing-function-docstring
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 from backend.app.api import user_crud

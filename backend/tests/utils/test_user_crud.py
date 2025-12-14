@@ -1,7 +1,7 @@
 """
 Unit tests for backend.app.crud
 """
-# pylint: disable=invalid-name, missing-function-docstring, import-error
+# pylint: disable=invalid-name, missing-function-docstring
 import uuid
 from sqlmodel import Session
 from backend.app.models import UserCreate, UserUpdate

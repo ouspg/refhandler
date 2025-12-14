@@ -1,4 +1,4 @@
-# pylint: disable=import-error, missing-function-docstring, missing-module-docstring
+# pylint: disable=missing-function-docstring, missing-module-docstring
 from fastapi import APIRouter, HTTPException
 
 from backend.app import security

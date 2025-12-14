@@ -1,4 +1,4 @@
-# pylint: disable=import-error, missing-function-docstring, line-too-long
+# pylint: disable=missing-function-docstring, line-too-long
 """
 Dependancies that can be injected into the FastAPI endpoint functions.
 

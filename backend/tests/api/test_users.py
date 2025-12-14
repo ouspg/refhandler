@@ -1,7 +1,7 @@
 """
 Unit tests for /api/users and /api/login
 """
-# pylint: disable=invalid-name, missing-function-docstring, import-error
+# pylint: disable=missing-function-docstring
 import uuid
 from fastapi.testclient import TestClient
 from sqlmodel import Session

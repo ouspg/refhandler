@@ -1,4 +1,4 @@
-# pylint: disable=import-error, missing-function-docstring, pointless-string-statement, missing-module-docstring, missing-class-docstring, unused-variable, fixme
+# pylint: disable=missing-function-docstring, pointless-string-statement, missing-module-docstring, missing-class-docstring, unused-variable, fixme
 import os
 import hashlib
 import requests
