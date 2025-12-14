@@ -1,12 +1,12 @@
 FROM python:3.12-slim
 
-WORKDIR /src
+WORKDIR /code
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir -r /code/requirements.txt
 
-ENV PYTHONPATH=/src
+ENV PYTHONPATH=/code
 
-COPY ./app /src/backend/app
+COPY ./app /code/backend/app
 
-CMD ["python", "/src/backend/app/main.py"]
+CMD ["python", "backend/app/main.py"]

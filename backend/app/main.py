@@ -59,4 +59,5 @@ app.add_middleware(
 
 if __name__ == "__main__":
     init_db()
-    uvicorn.run(app, host="0.0.0.0", port=BACKEND_PORT)
+    # TODO: get mutliple workers working. Integration tests fail 502 bad gateway
+    uvicorn.run("main:app", host="0.0.0.0", port=BACKEND_PORT)
