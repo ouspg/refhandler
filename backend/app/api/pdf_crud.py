@@ -11,6 +11,8 @@ import os
 import json
 from sqlmodel import Session, select
 from fastapi import UploadFile
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfparser import PDFParser
 from backend.app.models import Pdf, PdfCreate, VirusScanResult
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
@@ -63,6 +65,15 @@ def save_to_disk(pdf: Pdf, pdf_file: UploadFile):
         pdf_file.file.seek(0)
         f.write(pdf_file.file.read())
         
+
+
+def is_valid_pdf(pdf_file: UploadFile) -> bool:
+    try:
+        document = PDFDocument(PDFParser(pdf_file.file))
+        return True
+    except:
+        return False
+
 
 def get_file_path(file_id: str) -> str | None:
     file = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")

@@ -4,3 +4,4 @@ pytest-dotenv
 pytest-coverage
 pytest-mock
 pytest-asyncio
+pytest-docker

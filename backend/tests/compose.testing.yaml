@@ -1,0 +1,44 @@
+# For integration testing (Not used at the moment)
+# Overrides volumes so that any file system operations are not permanent
+services:
+  frontend:
+    networks: !override
+    - test_frontend
+
+    restart: no
+  backend:
+    networks: !override
+    - test_frontend
+    - test_backend
+    volumes: !reset []
+    post_start: !reset []
+    restart: no
+
+  postgres:
+    networks: !override
+    - test_backend
+    volumes: !reset []
+    restart: no
+
+  clamav-rest:
+    networks: !override
+    - test_backend
+    volumes: !reset []
+    restart: no
+
+  adminer:
+    networks: !override
+    - test_frontend
+    - test_backend
+    restart: no
+
+  deck-chores:
+    volumes: !reset []
+    restart: no
+
+networks:
+  test_frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  test_backend:

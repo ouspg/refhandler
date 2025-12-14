@@ -77,11 +77,9 @@ services:
     environment:
       MAX_FILE_SIZE: 100M
     networks:
-    #- frontend # Uncomment to curl the api from localhost
     - backend
     ports:
     - ${CLAMAV_PORT}:${CLAMAV_PORT}
-    #- 9443:9443
     volumes:
     - clamav_db:/var/lib/clamav
     - clamav_data:/clamav/data

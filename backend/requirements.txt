@@ -10,3 +10,4 @@ pyjwt
 passlib
 pydantic[email]
 bcrypt==4.3.0
+pdfminer

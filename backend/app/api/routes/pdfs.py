@@ -35,9 +35,11 @@ async def get_pdf_file(session: SessionDep, current_user: CurrentUser, file_id: 
 async def upload_pdf(session: SessionDep, scanners: ScannersDep,
                     current_user: CurrentUser, pdf_file: UploadFile,
                     response: Response):
-    # Reject files with wrong content type or no filename
-    # TODO: More checking. Check magic bytes?
-    if pdf_file.content_type != "application/pdf" or pdf_file.filename is None:
+    # Reject invalid PDF files
+    if pdf_file.filename is None:
+        raise HTTPException(422, "PDF file must have a name")
+    
+    if not pdf_crud.is_valid_pdf(pdf_file):
         raise HTTPException(422, "Invalid PDF file")
 
     pdf_content_hash = await get_sha256_hash(pdf_file)
