@@ -1,5 +1,5 @@
 """
-Contains pytest fixtures that are used for other tests.
+Contains pytest fixtures that are used by utils unit tests.
 Used to override dependancies such as Postges with unit-testable mockups.
 """
 # pylint: disable=missing-function-docstring, import-outside-toplevel
