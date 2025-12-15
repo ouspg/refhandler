@@ -4,7 +4,7 @@ Contains pytest fixtures that are used by integration tests.
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
 import pytest
-from backend.app.db import POSTGRES_URL
+from backend.app.postgres_db import POSTGRES_URL
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))

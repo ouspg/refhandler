@@ -2,7 +2,6 @@
 import os
 import hashlib
 import requests
-import json
 from requests.exceptions import Timeout
 from fastapi import UploadFile, HTTPException
 

@@ -18,7 +18,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlmodel import Session
 import jwt
 
-from backend.app.db import engine
+from backend.app.postgres_db import engine
 from backend.app.api.scanners import Scanners
 from backend.app.models import User, UserRole
 from backend.app import security
