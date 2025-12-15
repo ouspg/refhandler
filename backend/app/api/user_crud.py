@@ -37,7 +37,13 @@ def create_default_admin(session: Session) -> User:
 def update_user(session: Session, target_user: User, user_update: UserUpdate) -> User:
     new_data = user_update.model_dump(exclude_unset=True)
 
-    target_user.sqlmodel_update(new_data)
+    extra_data = {}
+    if "password" in new_data and new_data["password"] is not None:
+        password = new_data["password"]
+        hashed_password = get_password_hash(password)
+        extra_data["hashed_password"] = hashed_password
+    
+    target_user.sqlmodel_update(new_data, update=extra_data)
     session.add(target_user)
     session.commit()
     session.refresh(target_user)

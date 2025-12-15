@@ -6,7 +6,7 @@ import uuid
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from backend.app.models import UserCreate, UserUpdate, UserRole
+from backend.app.models import UserCreate, UserUpdate, UserRole, UserPublic
 from backend.app.api import user_crud
 
 
@@ -59,7 +59,8 @@ def test_update_users_me(client: TestClient, session: Session):
     response = client.patch(
         "/api/users/me", headers=token_header, json=new_data.model_dump())
     assert response.status_code == 200
-    assert created_user.email == new_email
+    user = UserPublic.model_validate_json(response.text)
+    assert user.email == new_email
 
 
 def test_update_users_me_email_in_use(client: TestClient, session: Session):
@@ -97,9 +98,9 @@ def test_get_users(client: TestClient, session: Session):
     # Get user with user id
     response = client.get(
         f"/api/users/{created_user.id}", headers=token_header)
-    data = response.json()
+    user = UserPublic.model_validate_json(response.text)
     assert response.status_code == 200
-    assert data["email"] == test_user.email
+    assert user.email == test_user.email
 
 
 def test_get_users_invalid_token(client: TestClient, session: Session):
@@ -136,9 +137,9 @@ def test_update_user_by_admin(client: TestClient, session: Session):
     response = client.patch(
         api_string, headers=admin_token_header, json=new_data.model_dump())
 
-    updated_email = response.json()["email"]
+    user = UserPublic.model_validate_json(response.text)
     assert response.status_code == 200
-    assert updated_email == new_email
+    assert user.email == new_email
 
 
 def test_update_user_by_other_user(client: TestClient, session: Session):
@@ -185,4 +186,5 @@ def test_delete_user_by_other_user(client: TestClient, session: Session):
 def test_signup(client: TestClient):
     response = client.post("/api/users/signup", json=test_user.model_dump())
     assert response.status_code == 200
-    assert response.json()["email"] == test_email
+    user = UserPublic.model_validate_json(response.text)
+    assert user.email == test_email
