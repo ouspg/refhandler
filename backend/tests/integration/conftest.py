@@ -1,3 +1,6 @@
+"""
+Contains pytest fixtures that are used by integration tests.
+"""
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
 import pytest
@@ -10,18 +13,18 @@ ADMINER_PORT = int(os.environ.get("ADMINER_PORT", 'NO ADMINER_PORT IN ENVIRONMEN
 CLAMAV_PORT = int(os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT'))
 
 
-# Override docker compose file used by docker_services fixture (default: /tests/docker-compose.yml)
+# Overrides docker compose file used by docker_services fixture (default: /tests/docker-compose.yml)
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), "compose.yaml")
 
-# Change project name to seperate it's networks and volumes from the real deployment.
-# Important because we delete docker volumes after running tests
+# Changes project name to seperate it's networks and volumes from the real deployment.
+# Important because we delete the docker volumes after running tests
 @pytest.fixture(scope="session")
 def docker_compose_project_name() -> str:
     return "refhandler-integration-test"
 
-# Stop the stack and delete volumes before starting a new one
+# Stops the stack and delete volumes before starting a new one
 @pytest.fixture(scope="session")
 def docker_setup():
     return ["down -v", "up --build --wait"]
