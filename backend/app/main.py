@@ -1,5 +1,6 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
+import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi import APIRouter
@@ -56,9 +57,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Define healthcheck endpoint
+@app.get("/healthcheck")
+def healthcheck():
+    return {"status": "ok"}
+
+# Filter healthcheck from uvicorn logs
+class EndpointFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return 'GET /healthcheck' not in record.getMessage()
+    
+logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
 if __name__ == "__main__":
     init_db()
     create_default_admin()
     # TODO: get mutliple workers working. Integration tests fail 502 bad gateway
-    uvicorn.run("main:app", host="0.0.0.0", port=BACKEND_PORT)
+    uvicorn.run("main:app", workers=4, host="0.0.0.0", port=BACKEND_PORT)

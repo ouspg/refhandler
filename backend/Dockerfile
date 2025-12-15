@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Install curl for compose health check
+RUN apt-get update && apt-get install -y curl
+
 WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt

@@ -3,7 +3,7 @@ services:
   frontend:
     depends_on:
         backend:
-          condition: service_started
+          condition: service_healthy
     build:
       context: ./frontend
     env_file: .env
@@ -40,6 +40,11 @@ services:
     post_start:
     - command: sh -c "alembic -c /src/backend/alembic.ini upgrade head"
     restart: unless-stopped
+    healthcheck:
+      test: /usr/bin/curl --fail http://localhost:${BACKEND_PORT}/healthcheck || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 10
 
   postgres:
     build:
