@@ -2,6 +2,7 @@
 import os
 import hashlib
 import requests
+import json
 from requests.exceptions import Timeout
 from fastapi import UploadFile, HTTPException
 
@@ -9,6 +10,8 @@ from fastapi import UploadFile, HTTPException
 CLAMAV_PORT = os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT')
 CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 
+VIRUSTOTAL_MALICIOUS_CUTOFF = int(os.environ.get(
+    "VIRUSTOTAL_MALICIOUS_CUTOFF", 'NO VIRUSTOTAL_MALICIOUS_CUTOFF IN ENVIRONMENT'))
 VIRUSTOTAL_API_KEY = os.environ.get(
     "VIRUSTOTAL_API_KEY", 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT')
 VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"
@@ -52,12 +55,18 @@ class Scanners:
                 VIRUSTOTAL_URL + pdf_content_hash, headers=headers, timeout=20)
         except Timeout as e:
             raise HTTPException(408, "Virustotal API call timed out") from e
-        results = parse_virustotal_response(response)
-
+        
+        # Check if Virustotal responded with an error
+        if "error" in response.json():
+            code, message = response.json()["error"].values()
+            return {"status_code": 401,
+                "results": f"Virustotal API error: {code}:{message}"
+                }
+        
         # Determine if file is malicious based on scan results
-        # Determine if file is malicious based on scan results
+        results = parse_virustotal_json(response.json())
         malicious, suspicious = results["malicious"], results["suspicious"]
-        if malicious > 2:
+        if malicious > VIRUSTOTAL_MALICIOUS_CUTOFF:
             return {
                 "status_code": 406,
                 "results": results
@@ -106,13 +115,5 @@ Example Virustotal API response
 }
 """
 
-def parse_virustotal_response(response: requests.models.Response):
-    data = response.json()
-
-    if "error" in data:
-        code, message = data["error"].values()
-        return {"status_code": 401,
-                "results": f"Virustotal API error: {code}:{message}"
-                }
-
-    return data["data"]["attributes"]["last_analysis_stats"]
+def parse_virustotal_json(response_json: dict):
+    return response_json["data"]["attributes"]["last_analysis_stats"]
