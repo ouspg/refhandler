@@ -57,9 +57,10 @@ def test_post_get_delete(session: Session, client: TestClient, mocker):
         assert pdf_file.read() == response_get.content
         assert response_get.headers["content-type"] == "application/pdf"
         
-        # Get the pdf object from database
+        # Get the pdf object from database and validate
         response_get = client.get(f"api/pdfs/{db_pdf.id}", headers=token_header)
         assert response_get.status_code == 200
+        PdfPublic.model_validate_json(response_get.text)
 
         # remove uploaded test file
         response_delete = client.delete(f"api/pdfs/{db_pdf.id}", headers=token_header)

@@ -12,7 +12,7 @@ from backend.app.models import PdfCreate, PdfPublic, UserRole
 router = APIRouter()
 
 
-@router.get("/{file_id}")
+@router.get("/{file_id}", response_model=PdfPublic)
 async def get_pdf_file(session: SessionDep, current_user: CurrentUser, file_id: str):
     # If file_id doesn't end in .pdf, get the pdf entry from database
     if file_id[-4:] != ".pdf":
@@ -39,15 +39,16 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep,
     if pdf_file.filename is None:
         raise HTTPException(422, "PDF file must have a name")
     
-    if not pdf_crud.is_valid_pdf(pdf_file):
-        raise HTTPException(422, "Invalid PDF file")
-
+    # Checks if file matching content hash exists, return it from db if it does
     pdf_content_hash = await get_sha256_hash(pdf_file)
     existing_pdf = pdf_crud.get_pdf_by_sha256_hash(session, pdf_content_hash)
-
     if existing_pdf:
         response.status_code = 409
         return existing_pdf
+
+    if not pdf_crud.is_valid_pdf(pdf_file):
+        raise HTTPException(422, "Invalid PDF file")
+
 
     # Scan file for viruses
     scan_results = await scanners.scan(pdf_file, pdf_content_hash)
@@ -67,7 +68,7 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep,
                            scan_result_id=scan_results_db.id,
                            content_hash=pdf_content_hash)
     db_pdf = pdf_crud.create_pdf(session, pdf_create)
-    pdf_crud.save_to_disk(db_pdf, pdf_file)
+    pdf_crud.save_to_disk(db_pdf.id, pdf_file)
 
     return db_pdf
 
@@ -86,3 +87,4 @@ async def get_file(session: SessionDep, current_user: CurrentUser, file_id: str)
     # File was found and belongs to current_user, deleting it from db and disk
     pdf_crud.delete_pdf(session, db_pdf)
     os.remove(file_path)
+    return {"message": f"{db_pdf.original_filename} deleted sucessfully"}

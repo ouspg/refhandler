@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 from fastapi import UploadFile
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
-from backend.app.models import Pdf, PdfCreate, VirusScanResult
+from backend.app.models import Pdf, PdfCreate, PdfUpdate, VirusScanResult
 
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -27,8 +27,8 @@ def create_pdf(session: Session, pdf_create: PdfCreate) -> Pdf:
     return db_pdf
 
 
-def update_pdf(session: Session, target_pdf: Pdf) -> Pdf:
-    new_data = target_pdf.model_dump(exclude_unset=True)
+def update_pdf(session: Session, target_pdf: Pdf, pdf_update: PdfUpdate) -> Pdf:
+    new_data = pdf_update.model_dump(exclude_unset=True)
 
     target_pdf.sqlmodel_update(new_data)
     session.add(target_pdf)
@@ -36,15 +36,15 @@ def update_pdf(session: Session, target_pdf: Pdf) -> Pdf:
     session.refresh(target_pdf)
     return target_pdf
 
-
 def delete_pdf(session: Session,  target_pdf: Pdf):
     session.delete(target_pdf)
     session.commit()
 
 
-def get_pdf_by_id(session: Session, pdf_id_in: str):
+def get_pdf_by_id(session: Session, pdf_id: uuid.UUID | str):
     try:
-        pdf_id = uuid.UUID(pdf_id_in)
+        if isinstance(pdf_id, str):
+            pdf_id = uuid.UUID(pdf_id)
     except ValueError:
         return None
 
@@ -58,13 +58,12 @@ def get_pdf_by_sha256_hash(session: Session, content_hash: str) -> Pdf | None:
     return db_pdf
 
 
-def save_to_disk(pdf: Pdf, pdf_file: UploadFile):
-    filename = str(pdf.id)
-    file_location = os.path.join(UPLOAD_DIR, f"{filename}.pdf")
+def save_to_disk(pdf_id: uuid.UUID | str, pdf_file: UploadFile):
+    file_location = os.path.join(UPLOAD_DIR, f"{str(pdf_id)}.pdf")
     with open(file_location, "wb") as f:
         pdf_file.file.seek(0)
         f.write(pdf_file.file.read())
-        
+
 
 
 def is_valid_pdf(pdf_file: UploadFile) -> bool:
@@ -75,8 +74,8 @@ def is_valid_pdf(pdf_file: UploadFile) -> bool:
         return False
 
 
-def get_file_path(file_id: str) -> str | None:
-    file = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
+def get_file_path(pdf_id: uuid.UUID | str) -> str | None:
+    file = os.path.join(UPLOAD_DIR, f"{str(pdf_id)}.pdf")
     if os.path.isfile(file):
         return file
     else:

@@ -37,20 +37,33 @@ class VirusScanResult(SQLModel, table=True):
     scan_results: str
 
 
-# For creating Pdf models. Contains the fields required before database operations
-class PdfCreate(SQLModel):
+class PdfBase(SQLModel):
     original_filename: str
     content_hash: str
-    uploaded_by: uuid.UUID = Field(foreign_key="user.id")
-    scan_result_id: uuid.UUID = Field(foreign_key="virusscanresult.id")
+    uploaded_by: uuid.UUID
+    scan_result_id: uuid.UUID
+
+# For creating Pdf models. Contains the fields required before database operations
+class PdfCreate(PdfBase):
+    pass
+
 
 # Pdf database table
-class Pdf(PdfCreate, table=True):
+class Pdf(PdfBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     parsed: bool = False
+    uploaded_by: uuid.UUID = Field(foreign_key="user.id")
     scan_result_id: uuid.UUID = Field(foreign_key="virusscanresult.id")
     scan_result: VirusScanResult = Relationship(back_populates="pdf")
 
+# For updating pdf information. Make sure all fields can be set to None
+# so you can initialize the model with only the fields you want to update
+class PdfUpdate(PdfBase):
+    id: uuid.UUID | None = None
+    original_filename: str | None = None
+    content_hash: str | None = None
+    uploaded_by: uuid.UUID | None = None
+    scan_result_id: uuid.UUID | None = None
 
 
 # For returning Pdf objects. Hides fields we don't want to return

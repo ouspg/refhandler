@@ -41,8 +41,11 @@ def test_delete_user(session: Session):
 def test_get_user_by_id(session: Session):
     created_user = user_crud.create_user(session, test_user)
     user_by_id = user_crud.get_user_by_id(session, created_user.id)
-
     assert user_by_id == created_user
+
+    # Try to get invalid user_id
+    invalid_user_by_id = user_crud.get_user_by_id(session, "foobar")
+    assert invalid_user_by_id is None
 
 
 def test_get_user_by_email(session: Session):
