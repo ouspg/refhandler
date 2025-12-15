@@ -1,5 +1,8 @@
 """
-Integration tests for the Refhandler compose stack
+Integration tests for the API endpoints
+
+docker_services in function argument means pytest-docker is used to run
+the docker compose stack before running tests. (see conftest.py for details)
 """
 # pylint: disable=missing-function-docstring, unused-argument, unused-import
 import os

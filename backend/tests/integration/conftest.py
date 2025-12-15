@@ -29,11 +29,6 @@ def docker_compose_project_name() -> str:
 def docker_setup():
     return ["down -v", "up --build --wait"]
 
-# Make sure stack and volumes are cleaned up on test failure
-@pytest.fixture(scope="session")
-def docker_cleanup():
-    return "down -v"
-
 
 @pytest.fixture(scope="session")
 def frontend_url(docker_ip):

@@ -56,8 +56,11 @@ def delete_user(session: Session,  target_user: User):
 
 
 def get_user_by_id(session: Session, user_id: uuid.UUID | str):
-    if isinstance(user_id, str):
-        user_id = uuid.UUID(user_id)
+    try:
+        if isinstance(user_id, str):
+            user_id = uuid.UUID(user_id)
+    except ValueError:
+        return None
 
     db_user = session.get(User, user_id)
     return db_user

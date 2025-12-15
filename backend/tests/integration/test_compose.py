@@ -1,8 +1,8 @@
 """
 Integration tests for the Refhandler compose stack
 
-docker_services in function argument means pytest-docker is used to run a docker compose stack
-before running tests. (see /backend/tests/integration/conftest.py for details)
+docker_services in function argument means pytest-docker is used to run
+the docker compose stack before running tests. (see conftest.py for details)
 """
 # pylint: disable=missing-function-docstring, unused-argument, unused-import, fixme, unused-variable
 import pytest
@@ -24,20 +24,15 @@ def test_backend_hidden_from_localhost(docker_services, backend_url):
     assert response.status_code == 404
 
 
-@pytest.mark.skip(reason="Test isn't meaningful, /api endpoint doesn't respond anyway")
-def test_api_hidden_from_localhost(docker_services, api_url):
-    response = requests.get(api_url, timeout=20)
-    assert response.status_code == 404
-
-
 @pytest.mark.skip(reason="Test isn't meaningful, can't send raw requests to postgres")
 def test_postgres_hidden_from_localhost(docker_services, postgres_url):
     with pytest.raises(requests.exceptions.ConnectionError):
         response = requests.get(postgres_url, timeout=20)
 
 
-@pytest.mark.skip(reason="Clamav reachable, needs fixing") #TODO
+#TODO: ClamAV shouldn't be reacheable from localhost.
+# Possibly caused by EXPOSE 9000 in the prebuilt image?
+@pytest.mark.skip(reason="Clamav reachable, needs fixing")
 def test_clamav_hidden_from_localhost(docker_services, clamav_url):
     response = requests.get(clamav_url, timeout=20)
     assert response.status_code == 404
-
