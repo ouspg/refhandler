@@ -59,8 +59,8 @@ services:
     post_start:
       - command: sh -c "./dump_database.sh"
     labels:
-      deck-chores.pg-dump.command: sh -c ""./dump_database.sh"
-      deck-chores.pg-dump.interval: daily
+      deck-chores.dump-database.command: sh -c "./dump_database.sh"
+      deck-chores.dump-database.interval: daily
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
