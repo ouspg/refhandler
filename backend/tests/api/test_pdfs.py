@@ -30,6 +30,7 @@ def _get_access_token_header(client: TestClient, username: str, password: str):
 
 def test_post_get_delete(session: Session, client: TestClient, mocker):
     created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
     token_header = _get_access_token_header(client, test_email, test_password)
 
     # Mock ClamAV scan result with safe file

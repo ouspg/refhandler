@@ -73,8 +73,10 @@ def test_update_users_me(client: TestClient, session: Session):
 
 def test_update_users_me_email_in_use(client: TestClient, session: Session):
     user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    assert user1 is not None
     user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
+    assert user2 is not None
     user1_token_header = _get_access_token_header(client, test_email, test_password)
 
     # Try to update first user's email to second user's email
@@ -101,6 +103,7 @@ def test_delete_users_me(client: TestClient, session: Session):
 
 def test_get_users(client: TestClient, session: Session):
     created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
     header = _get_access_token_header(client, test_email, test_password)
 
     # Get user with user id
@@ -113,6 +116,7 @@ def test_get_users(client: TestClient, session: Session):
 
 def test_get_users_invalid_token(client: TestClient, session: Session):
     created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
     token = "invalid"
     header = {"Authorization": f"Bearer {token}"}
 
@@ -134,6 +138,7 @@ def test_get_users_invalid_id(client: TestClient, session: Session):
 
 def test_update_user_by_admin(client: TestClient, session: Session):
     created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
     user_crud.create_user(session, test_admin)
     admin_header = _get_access_token_header(
         client, test_admin.email, test_admin.password)
@@ -152,8 +157,10 @@ def test_update_user_by_admin(client: TestClient, session: Session):
 
 def test_update_user_by_other_user(client: TestClient, session: Session):
     user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    assert user1 is not None
     user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
+    assert user2 is not None
     user1_header = _get_access_token_header(client, test_email, test_password)
 
     # Try to update second user's email using first user
@@ -167,6 +174,7 @@ def test_update_user_by_other_user(client: TestClient, session: Session):
 
 def test_delete_user_by_admin(client: TestClient, session: Session):
     created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
     user_crud.create_user(session, test_admin)
     admin_header = _get_access_token_header(
         client, test_admin.email, test_admin.password)
@@ -180,8 +188,10 @@ def test_delete_user_by_admin(client: TestClient, session: Session):
 
 def test_delete_user_by_other_user(client: TestClient, session: Session):
     user1 = user_crud.create_user(session, UserCreate(email=test_email, password=test_password))
+    assert user1 is not None
     user2 = user_crud.create_user(session, UserCreate(
         email="foofoo@barbar.com", password=test_password))
+    assert user2 is not None
     user1_header = _get_access_token_header(client, test_email, test_password)
 
     # Try to delete second user using first user

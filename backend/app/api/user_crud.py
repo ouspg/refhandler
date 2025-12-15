@@ -17,7 +17,11 @@ ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 
-def create_user(session: Session, user_create: UserCreate) -> User:
+def create_user(session: Session, user_create: UserCreate) -> User | None:
+    # Skip user creation if email is already in use
+    if get_user_by_email(session, user_create.email):
+        return None
+
     db_user = User.model_validate(
         user_create, update={
             "hashed_password": get_password_hash(user_create.password)}
@@ -28,9 +32,8 @@ def create_user(session: Session, user_create: UserCreate) -> User:
     return db_user
 
 
-def create_default_admin(session: Session) -> User:
+def create_default_admin(session: Session) -> User | None:
     admin_user = UserCreate(role=UserRole.admin, email=ADMIN_EMAIL, password=ADMIN_PASSWORD)
-
     return create_user(session, admin_user)
 
 

@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.app.api.routes import login, users, pdfs
-from backend.app.postgres_db import init_db
+from backend.app.postgres_db import init_db, create_default_admin
 
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
 FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
@@ -59,5 +59,6 @@ app.add_middleware(
 
 if __name__ == "__main__":
     init_db()
+    create_default_admin()
     # TODO: get mutliple workers working. Integration tests fail 502 bad gateway
     uvicorn.run("main:app", host="0.0.0.0", port=BACKEND_PORT)

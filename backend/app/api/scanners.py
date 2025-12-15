@@ -23,7 +23,7 @@ class Scanners:
     # https://github.com/ajilach/clamav-rest?tab=readme-ov-file#quick-start
     async def clamav_scan(self, file: UploadFile):
         files = {
-            'files': (file.filename, await file.read(), file.content_type)
+            'files': file.file
         }
 
         try:

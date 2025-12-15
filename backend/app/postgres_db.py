@@ -15,12 +15,12 @@ ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", 'NO ADMIN_EMAIL IN ENVIRONMENT')
 
 engine = create_engine(POSTGRES_URL)
 
-
-def init_db():
+def init_db(_engine = engine):
     # Initialize database tables using SQLMOdels from /backend/app/models.py
-    SQLModel.metadata.create_all(bind=engine)
+    SQLModel.metadata.create_all(bind=_engine)
 
-    with Session(engine) as session:
+def create_default_admin(_engine = engine):
+    with Session(_engine) as session:
         # Create default admin account if it doesn't exist yet
         if user_crud.get_user_by_email(session, ADMIN_EMAIL) is None:
             user_crud.create_default_admin(session)
