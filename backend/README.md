@@ -10,12 +10,12 @@ All API endpoints with `current_user: CurrentUser` in their function arguments r
 
 1. Create login JSON payload `{"username": user_email,"password": user_password}`. Note the login credentials are `email:password`, but FastAPI security library uses Oauth2 password flow, which is why the payload key is `username` instead of `email`.
 2. POST the login payload to `/api/login/access-token`
-3. If login credentials are valid, the API generates and sends back a JWT token as a string. Token is valid for 1 week (can be changed in `/backend/app/security.py`).
+3. If login credentials are valid, the API generates and sends back a JWT token as a string. Token is valid for 1 week (can be changed in [/backend/app/security.py](/backend/app/security.py)).
 4. Add the JWT token to API requests as a header: `Authorization: Bearer <token>`
 
 ### Default admin account
 
-The database is initialized with a default admin account. Credentials available in the `.env` file. (Remember to change the default password before production use).
+The database is initialized with a default admin account. Credentials available in the [.env](.env) file. (Remember to change the default password before production use).
 
 ### /api/users
 
@@ -23,8 +23,8 @@ The database is initialized with a default admin account. Credentials available 
 🛠️: Admin accounts only
 
 - 🔒`GET /api/users/me` Get user information for the **currently authenticated user**
-- 🔒`PATCH /api/users/me` Update user information for the **currently authenticated user** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged.
-- 🔒🛠️`PATCH /api/users/user_id` Update user information for the **user with UUID matching `user_id`** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged. **Admin only.**
+- 🔒`PATCH /api/users/me` Update user information for the **currently authenticated user** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see [/backend/app/models.py](/backend/app/models.py) for details). Initialize the model with only the fields you want to update, the rest will remain unchanged.
+- 🔒🛠️`PATCH /api/users/user_id` Update user information for the **user with UUID matching `user_id`** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see [/backend/app/models.py](/backend/app/models.py) for details). Initialize the model with only the fields you want to update, the rest will remain unchanged. **Admin only.**
 - 🔒`DELETE /api/users/me` Delete the **currently authenticated user**
 - 🔒🛠️`DELETE /api/users/user_id` Delete the **user with UUID matching `user_id`**. **Admin only.**
 - 🔒`GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
@@ -81,7 +81,7 @@ pytest ./backend/tests/
 
 ## Running database migrations with alembic
 
-Making changes to SQLModels in `/backend/app/models.py` will lead to a conflict between new and existing database tables.
+Making changes to SQLModels in [/backend/app/models.py](/backend/app/models.py) will lead to a conflict between new and existing database tables.
 
 To update the existing database tables to the new models without losing data, migration scripts can be generated using alembic.
 

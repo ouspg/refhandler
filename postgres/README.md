@@ -2,7 +2,7 @@
 
 ## Backups
 
-The Postgres database container uses the script `/postgres/dump_database.sh`
+The Postgres database container uses the script [/postgres/dump_database.sh](/postgres/dump_database.sh)
 to backup the database into a dump file in two ways:
 
 1. When the docker stack is started using post_start
@@ -10,7 +10,7 @@ to backup the database into a dump file in two ways:
 
 ### Backup retention
 
-Database dumps older than `$BACKUP_RETENTION` will be deleted when the script is run (default 30 days, can be changed in the `.env` file).
+Database dumps older than `$BACKUP_RETENTION` will be deleted when the script is run (default 30 days, can be changed in the [.env](.env) file).
 
 ### Restoring backups
 
