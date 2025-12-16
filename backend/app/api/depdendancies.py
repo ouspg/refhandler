@@ -5,7 +5,7 @@ Dependancies that can be injected into the FastAPI endpoint functions.
 SessionDep: Contains database session that API endpoints will use for database operations
 ScannersDep: Contains malware scanners, used by /api/pdfs
 
-OAuth2Dep: For /api/login credentials form
+OAuth2Dep: For /api/login/access-token credentials form
 TokenDep: For JWT token decoding in get_current_user() 
 CurrentUser: For authenticating API endpoints. Checks if the API call has a valid JWT token.
 CurrentAdmin: Same as CurrentUser, but requires the authenticated user to have the role UserRole.admin

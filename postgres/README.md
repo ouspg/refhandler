@@ -23,6 +23,6 @@ docker compose exec postgres bash
 
 # Restore a database dump
 # --clean allows the dump to be restored on top of an existing database
-pg_restore -U $POSTGRES_USER -d $POSTGRES_DB --clean /backups/dumpname.dump 
-
+cd /backups
+pg_restore -U $POSTGRES_USER -d $POSTGRES_DB --clean dumpname.dump
 ```

@@ -13,6 +13,8 @@ Process flow:
 5. Before sending response, API uses response_model=ModelPublic to strip
     fields from Model that don't exist in ModelPublic
 6. API returns ModelPublic as a JSON object
+
+JSON -> ModelCreate -> Model -> ModelPublic -> JSON 
 """
 # pylint: disable=missing-function-docstring, missing-class-docstring, invalid-name
 import uuid
