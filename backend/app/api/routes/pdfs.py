@@ -1,3 +1,12 @@
+"""
+API definitions for /api/pdfs
+
+If the API function has types CurrentUser or CurrentAdmin as an argument,
+using the API endpoint requires a valid access token header.
+CurrentAdmin additionally requires the user to have the role UserRole.admin.
+
+(see API documentation in /backend/README.md for details)
+"""
 # pylint: disable=missing-function-docstring, missing-module-docstring, missing-class-docstring, unused-variable, fixme, unused-argument
 import os
 from fastapi import UploadFile, APIRouter, HTTPException
