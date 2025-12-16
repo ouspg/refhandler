@@ -22,12 +22,6 @@ services:
     build:
       context: ./backend
     env_file: .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_SERVER: ${POSTGRES_SERVER}
-      POSTGRES_PORT: ${POSTGRES_PORT}
     networks:
     - frontend
     - backend
@@ -52,10 +46,6 @@ services:
     build:
       context: ./postgres
     env_file: .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     networks:
     - backend
     ports:

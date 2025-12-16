@@ -24,7 +24,7 @@ def docker_compose_file(pytestconfig):
 def docker_compose_project_name() -> str:
     return "refhandler-integration-test"
 
-# Stops the stack and delete volumes before starting a new one
+# Stop the stack and delete volumes before starting a new one
 @pytest.fixture(scope="session")
 def docker_setup():
     return ["down -v", "up --build --wait"]
@@ -41,10 +41,6 @@ def api_url(docker_ip):
 @pytest.fixture(scope="session")
 def backend_url(docker_ip):
     return f"http://{docker_ip}:{BACKEND_PORT}"
-
-@pytest.fixture(scope="session")
-def postgres_url():
-    return "http://" + POSTGRES_URL
 
 @pytest.fixture(scope="session")
 def adminer_url(docker_ip):

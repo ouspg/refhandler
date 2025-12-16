@@ -14,21 +14,19 @@ def test_frontend_reachable(docker_services, frontend_url):
     assert response.status_code == 200
 
 
+def test_nginx_api_proxy(docker_services, frontend_url):
+    response = requests.get(frontend_url+"/healthcheck", timeout=20)
+    assert response.status_code == 200
+
+
 def test_adminer_reachable(docker_services, adminer_url):
     response = requests.get(adminer_url, timeout=20)
     assert response.status_code == 200
 
-# TODO: healthcheck should only reachable from frontend_url/api
-@pytest.mark.skip(reason="healthcheck is reachable, should be only behind frontend/api")
-def test_backend_hidden_from_localhost(docker_services, backend_url):
-    response = requests.get(backend_url+"/healthcheck", timeout=20)
-    assert response.status_code == 404
 
-
-@pytest.mark.skip(reason="Test isn't meaningful, can't send raw requests to postgres")
-def test_postgres_hidden_from_localhost(docker_services, postgres_url):
-    with pytest.raises(requests.exceptions.ConnectionError):
-        response = requests.get(postgres_url, timeout=20)
+def test_backend_healthcheck(docker_services, backend_url):
+    response = requests.get(backend_url+"/api/healthcheck", timeout=20)
+    assert response.status_code == 200
 
 
 #TODO: ClamAV shouldn't be reacheable from localhost.
