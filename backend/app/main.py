@@ -28,12 +28,24 @@ EXTRA_ALLOWED_ORIGIN_PORTS = [
 for p in EXTRA_ALLOWED_ORIGIN_PORTS:
     CORS_ALLOWED_ORIGINS.extend([f"http://localhost:{p}", f"http://127.0.0.1:{p}"])
 
-
 # Combine all routers into one API router
 api_router = APIRouter()
 api_router.include_router(pdfs.router, prefix="/pdfs", tags=["Pdfs"])
 api_router.include_router(login.router, prefix="/login", tags=["Login"])
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
+
+
+# Define healthcheck endpoint
+@api_router.get("/healthcheck")
+def healthcheck():
+    return {"status": "ok"}
+
+# Filter healthcheck from uvicorn logs
+class EndpointFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return 'GET /api/healthcheck' not in record.getMessage()
+logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
 
 # Initialize app and include api router with /api prefix
 if ENVIRONMENT == "production":
@@ -57,17 +69,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define healthcheck endpoint
-@app.get("/healthcheck")
-def healthcheck():
-    return {"status": "ok"}
-
-# Filter healthcheck from uvicorn logs
-class EndpointFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return 'GET /healthcheck' not in record.getMessage()
-    
-logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
 if __name__ == "__main__":
     init_db()

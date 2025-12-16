@@ -34,16 +34,18 @@ services:
     ports:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
-    - pdf_uploads:/pdf_uploads
+    - pdf_uploads:${UPLOAD_DIR}
     - ./backend/alembic.ini:/src/backend/alembic.ini
     - ./backend/alembic/:/src/backend/alembic
     post_start:
     - command: sh -c "alembic -c /src/backend/alembic.ini upgrade head"
     restart: unless-stopped
     healthcheck:
-      test: /usr/bin/curl --fail http://localhost:${BACKEND_PORT}/healthcheck || exit 1
+      test: /usr/bin/curl --fail http://localhost:${BACKEND_PORT}/api/healthcheck || exit 1
       interval: 30s
-      timeout: 5s
+      start_period: 30s
+      start_interval: 5s
+      timeout: 10s
       retries: 10
 
   postgres:
@@ -70,7 +72,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
-      retries: 5
+      retries: 10
       start_period: 30s
       timeout: 10s
 

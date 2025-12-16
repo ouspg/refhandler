@@ -17,4 +17,5 @@ FROM nginx:1
 
 COPY --from=build-stage /app/dist/ /usr/share/nginx/html
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Nginx uses envsub to inject env variables into the template and copy it to /etc/nginx/conf.d
+COPY ./nginx.conf /etc/nginx/templates/nginx.conf.template
