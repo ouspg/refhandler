@@ -13,8 +13,8 @@ from sqlmodel import Session, select
 from backend.app.security import get_password_hash, verify_password
 from backend.app.models import User, UserCreate, UserUpdate, UserRole
 
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 
 def create_user(session: Session, user_create: UserCreate) -> User | None:

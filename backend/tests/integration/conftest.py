@@ -6,11 +6,11 @@ import os
 import pytest
 from backend.app.postgres_db import POSTGRES_URL
 
-BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
-FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
-POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
-ADMINER_PORT = int(os.environ.get("ADMINER_PORT", 'NO ADMINER_PORT IN ENVIRONMENT'))
-CLAMAV_PORT = int(os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT'))
+BACKEND_PORT = int(os.environ["BACKEND_PORT"])
+FRONTEND_PORT = int(os.environ["FRONTEND_PORT"])
+POSTGRES_PORT = int(os.environ["POSTGRES_PORT"])
+ADMINER_PORT = int(os.environ["ADMINER_PORT"])
+CLAMAV_PORT = int(os.environ["CLAMAV_PORT"])
 
 
 # Overrides docker compose file used by docker_services fixture (default: /tests/docker-compose.yml)

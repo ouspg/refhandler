@@ -6,13 +6,11 @@ from requests.exceptions import Timeout
 from fastapi import UploadFile, HTTPException
 
 
-CLAMAV_PORT = os.environ.get("CLAMAV_PORT", 'NO CLAMAV_PORT IN ENVIRONMENT')
+CLAMAV_PORT = os.environ["CLAMAV_PORT"]
 CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 
-VIRUSTOTAL_MALICIOUS_CUTOFF = int(os.environ.get(
-    "VIRUSTOTAL_MALICIOUS_CUTOFF", 'NO VIRUSTOTAL_MALICIOUS_CUTOFF IN ENVIRONMENT'))
-VIRUSTOTAL_API_KEY = os.environ.get(
-    "VIRUSTOTAL_API_KEY", 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT')
+VIRUSTOTAL_MALICIOUS_CUTOFF = int(os.environ["VIRUSTOTAL_MALICIOUS_CUTOFF"])
+VIRUSTOTAL_API_KEY = os.environ["VIRUSTOTAL_API_KEY"]
 VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"
 
 # Class for calling file scanner APIs
@@ -37,7 +35,7 @@ class Scanners:
     # Scan files using VirusTotal API
     async def virustotal_scan(self, pdf_content_hash: str):
         # Skip scanning if no API key is provided
-        if VIRUSTOTAL_API_KEY == 'NO VIRUSTOTAL_API_KEY IN ENVIRONMENT' or VIRUSTOTAL_API_KEY == "":
+        if VIRUSTOTAL_API_KEY == "":
             return {
                 "status_code": 401,
                 "results": "No API key provided"

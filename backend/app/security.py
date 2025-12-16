@@ -8,7 +8,7 @@ import jwt
 from passlib.context import CryptContext
 
 ALGORITHM = "HS256"
-SECRET_KEY = str(os.environ.get("SECRET_KEY", 'NO SECRET_KEY IN ENVIRONMENT'))
+SECRET_KEY = os.environ["SECRET_KEY"]
 EXPIRATION = timedelta(weeks=1)
 
 cc = CryptContext(schemes=["bcrypt"], deprecated="auto")

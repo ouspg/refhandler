@@ -9,9 +9,9 @@ from starlette.middleware.cors import CORSMiddleware
 from backend.app.api.routes import login, users, pdfs
 from backend.app.postgres_db import init_db, create_default_admin
 
-BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
-FRONTEND_PORT = int(os.environ.get("FRONTEND_PORT", 'NO BACKEND_PORT IN ENVIRONMENT'))
-ENVIRONMENT = os.environ.get("ENVIRONMENT", 'NO ENVIRONMENT IN ENVIRONMENT')
+BACKEND_PORT = int(os.environ["BACKEND_PORT"])
+FRONTEND_PORT = int(os.environ["FRONTEND_PORT"])
+ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
@@ -20,7 +20,7 @@ CORS_ALLOWED_ORIGINS = [
     f"http://127.0.0.1:{FRONTEND_PORT}",
 ]
 
-EXTRA_ALLOWED_ORIGIN_PORTS = os.environ.get("EXTRA_ALLOWED_ORIGIN_PORTS", '')  # Extra port for Development purpose, comma separated
+EXTRA_ALLOWED_ORIGIN_PORTS = os.environ.get("EXTRA_ALLOWED_ORIGIN_PORTS", "")  # Extra port for Development purpose, comma separated
 EXTRA_ALLOWED_ORIGIN_PORTS = [
     p for p in (s.strip() for s in EXTRA_ALLOWED_ORIGIN_PORTS.split(','))
     if p.isdigit() and 1 <= int(p) <= 65535

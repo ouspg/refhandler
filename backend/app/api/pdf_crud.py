@@ -15,7 +15,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
 from backend.app.models import Pdf, PdfCreate, PdfUpdate, VirusScanResult
 
-UPLOAD_DIR = os.environ.get("UPLOAD_DIR", 'NO UPLOAD_DIR IN ENVIRONMENT')
+UPLOAD_DIR = os.environ["UPLOAD_DIR"]
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 

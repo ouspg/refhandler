@@ -15,8 +15,8 @@ test_email = "foo@bar.com"
 test_password = "foobarbaz"
 test_user = UserCreate(email=test_email, password=test_password)
 
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", 'NO ADMIN_EMAIL IN ENVIRONMENT')
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", 'NO ADMIN_PASSWORD IN ENVIRONMENT')
+ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 
 def _get_oauth2_login(username: str, password: str):
