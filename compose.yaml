@@ -96,18 +96,21 @@ services:
       retries: 10
 
 
-# Adminer: Database management dashboard
-  adminer:
-    image: adminer
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
+  pgadmin:
+    image: dpage/pgadmin4
     networks:
     - frontend
     - backend
     ports:
-      - ${ADMINER_PORT}:8080
+      - ${ADMINER_PORT}:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - postgres_data:/postgres_data
+      - postgres_backups:/postgres_backups
+    restart: unless-stopped
 
 # Deck-chores: Cron Scheduler for docker containers
   deck-chores:
@@ -135,3 +138,4 @@ volumes:
   postgres_backups:
   clamav_db:
   clamav_data:
+  pgadmin_data:
