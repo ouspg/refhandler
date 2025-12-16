@@ -74,6 +74,16 @@ def is_valid_pdf(pdf_file: UploadFile) -> bool:
         return False
 
 
+def ends_in_dot_pdf(string: str):
+    return string[-4:] == ".pdf"
+
+def strip_dot_pdf(string: str):
+    if ends_in_dot_pdf(string):
+        return string[:-4]
+    else:
+        return string
+
+
 def get_file_path(pdf_id: uuid.UUID | str) -> str | None:
     file = os.path.join(UPLOAD_DIR, f"{str(pdf_id)}.pdf")
     if os.path.isfile(file):
