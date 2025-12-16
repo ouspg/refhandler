@@ -20,25 +20,22 @@ from backend.app.models import PdfCreate, PdfPublic, UserRole
 
 router = APIRouter()
 
-
+# Get pdf database object (file_id) or pdf file on disk (file_id.pdf)
 @router.get("/{file_id}", response_model=PdfPublic)
 async def get_pdf_file(session: SessionDep, current_user: CurrentUser, file_id: str):
-    # If file_id doesn't end in .pdf, get the pdf entry from database
-    if file_id[-4:] != ".pdf":
-        db_pdf = pdf_crud.get_pdf_by_id(session, file_id)
-        if db_pdf is None:
-            raise HTTPException(404, "Pdf file not found in database")
+    db_pdf = pdf_crud.get_pdf_by_id(session, strip_dot_pdf(file_id))
+    if not db_pdf:
+        raise HTTPException(404, "Pdf not found in database")
+    
+    if ends_in_pdf(file_id):
+        file_path = pdf_crud.get_file_path(strip_dot_pdf(file_id))
+        if file_path is None:
+            raise HTTPException(404, "Pdf file not found on disk")
+        header = {"Content-Type": "application/pdf"}
+        return FileResponse(file_path, filename=db_pdf.original_filename, headers=header)
+    else:
         return db_pdf
 
-    # file_id ended in .pdf, get the pdf file from disk
-    file_id = file_id[:-4]
-    file_path = pdf_crud.get_file_path(file_id)
-    db_pdf = pdf_crud.get_pdf_by_id(session, file_id)
-    if file_path is None or db_pdf is None:
-        raise HTTPException(404, "Pdf file not found on disk")
-
-    header = {"Content-Type": "application/pdf"}
-    return FileResponse(file_path, filename=db_pdf.original_filename, headers=header)
 
 @router.post("/", response_model=PdfPublic)
 async def upload_pdf(session: SessionDep, scanners: ScannersDep,
@@ -81,19 +78,39 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep,
 
     return db_pdf
 
+# TODO: patch db objects using pdf_crud.update_pdf
+# TODO: patch pdf files?
+# TODO: delete pdf files only?
 
+# Delete pdf database object (file_id) or pdf file on disk (file_id.pdf)
 @router.delete("/{file_id}")
 async def get_file(session: SessionDep, current_user: CurrentUser, file_id: str):
-    db_pdf = pdf_crud.get_pdf_by_id(session, file_id)
-    file_path = pdf_crud.get_file_path(file_id)
-
-    if not db_pdf or not file_path:
-        raise HTTPException(404, "File not found")
+    db_pdf = pdf_crud.get_pdf_by_id(session, strip_dot_pdf(file_id))
+    if not db_pdf:
+        raise HTTPException(404, "Pdf not found in database")
+    
+    # Stop normal users from deleting other user's files
     if db_pdf.uploaded_by != current_user.id:
         if current_user.role != UserRole.admin:
             raise HTTPException(403, "Only admins can delete other user's files")
     
-    # File was found and belongs to current_user, deleting it from db and disk
-    pdf_crud.delete_pdf(session, db_pdf)
-    os.remove(file_path)
-    return {"message": f"{db_pdf.original_filename} deleted sucessfully"}
+    if ends_in_pdf(file_id):
+        file_path = pdf_crud.get_file_path(strip_dot_pdf(file_id))
+        if file_path is None:
+            raise HTTPException(404, "Pdf file not found on disk")
+        # File found, deleting it from disk
+        os.remove(file_path)
+        return {"message": f"{db_pdf.original_filename} deleted sucessfully"}
+    else:
+        pdf_crud.delete_pdf(session, db_pdf)
+        return {"message": f"{db_pdf.original_filename} deleted sucessfully"}
+
+
+def ends_in_pdf(file_id: str):
+    return file_id[-4:] == ".pdf"
+
+def strip_dot_pdf(file_id: str):
+    if ends_in_pdf(file_id):
+        return file_id[:-4]
+    else:
+        return file_id

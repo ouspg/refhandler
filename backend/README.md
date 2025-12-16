@@ -4,6 +4,10 @@
 
 ### Authentication
 
+All API endpoints with `current_user: CurrentUser` in their function arguments require a valid access token header, and `current_admin: CurrentAdmin` additionally require the authenticated user to have the role `UserRole.admin`.
+
+#### Getting access tokens
+
 1. Create login JSON payload `{"username": user_email,"password": user_password}`. Note the login credentials are `email:password`, but FastAPI security library uses Oauth2 password flow, which is why the payload key is `username` instead of `email`.
 2. POST the login payload to `/api/login/access-token`
 3. If login credentials are valid, the API generates and sends back a JWT token as a string. Token is valid for 1 week (can be changed in `/backend/app/security.py`).
@@ -20,17 +24,22 @@ The database is initialized with a default admin account. Credentials available 
 
 - 🔒`GET /api/users/me` Get user information for the **currently authenticated user**
 - 🔒`PATCH /api/users/me` Update user information for the **currently authenticated user** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged.
-- 🔒🛠️`PATCH /api/users/user_id` Update user information for the **user with UUID matching `user_id`** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged. Admin only.
+- 🔒🛠️`PATCH /api/users/user_id` Update user information for the **user with UUID matching `user_id`** by sending a PATCH request with a JSON payload matching the pydantic model `UserUpdate` (see `/backend/app/models.py` for details). Initialize the model with only the fields you want to update, the rest will remain unchanged. **Admin only.**
 - 🔒`DELETE /api/users/me` Delete the **currently authenticated user**
-- 🔒🛠️`DELETE /api/users/user_id` Delete the **user with UUID matching `user_id`**. Admin only.
+- 🔒🛠️`DELETE /api/users/user_id` Delete the **user with UUID matching `user_id`**. **Admin only.**
 - 🔒`GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
 - `POST /api/users/signup` **Register a new user account** by sending a POST request with a JSON payload matching the pydantic model `UserCreate` (see `/backend/app/models.py` for details)
 
 ### /api/pdfs
 
-- `POST /api/pdfs/` Accepts POST requests with a **PDF file in the `multipart/form-data` format**. If the file passes malware scanning, it is stored on disk and the API responds with pydantic model `Pdf` of the file (see `/backend/app/models.py` for details).
-- `GET /api/pdfs/file_id`: Get the **PDF file matching the UUID `file_id`** from disk.
-- `DELETE /api/pdfs/file_id`: Delete the **PDF file matching the UUID `file_id`** from disk.
+🔒: requires valid access token
+🛠️: Admin accounts only
+
+- 🔒`POST /api/pdfs/` Accepts POST requests with a **PDF file in the `multipart/form-data` format**. If the file passes malware scanning, it is stored on disk and the API responds with pydantic model `Pdf` of the file (see `/backend/app/models.py` for details).
+- 🔒`GET /api/pdfs/file_id`: Get the **PDF database entry** matching the UUID `file_id`.
+- 🔒`GET /api/pdfs/file_id.pdf`: Get the **PDF file** matching the UUID `file_id` **from disk**.
+- 🔒`DELETE /api/pdfs/file_id.pdf`: Delete the **PDF file matching the UUID `file_id`** from disk. Deleting other user's files requires Admin privileges.
+- 🔒`DELETE /api/pdfs/file_id`: Delete the **PDF database entry** matching the UUID `file_id`.  Deleting other user's database entries requires Admin privileges.
 
 ### Swagger UI
 

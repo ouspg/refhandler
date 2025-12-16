@@ -64,12 +64,16 @@ def test_post_get_delete(session: Session, client: TestClient, mocker):
         PdfPublic.model_validate_json(response_get.text)
 
         # remove uploaded test file
-        response_delete = client.delete(f"api/pdfs/{db_pdf.id}", headers=token_header)
+        response_delete = client.delete(f"api/pdfs/{db_pdf.id}.pdf", headers=token_header)
         assert response_delete.status_code == 200
-
         # Make sure file was removed
         response_after_delete = client.get(f"api/pdfs/{db_pdf.id}.pdf", headers=token_header)
         assert response_after_delete.status_code == 404
+        
+        # remove pdf database entry
+        response_delete = client.delete(f"api/pdfs/{db_pdf.id}", headers=token_header)
+        assert response_delete.status_code == 200
+        # Make sure entry was removed
         response_after_delete = client.get(f"api/pdfs/{db_pdf.id}", headers=token_header)
         assert response_after_delete.status_code == 404
 

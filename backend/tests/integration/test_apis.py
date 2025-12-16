@@ -105,11 +105,16 @@ def test_api_pdfs(api_url, docker_services):
         assert response_get.status_code == 200
 
         # remove uploaded test file
-        response_delete = requests.delete(f"{api_url}/pdfs/{db_pdf.id}", headers=header, timeout=20)
+        response_delete = requests.delete(f"{api_url}/pdfs/{db_pdf.id}.pdf", headers=header, timeout=20)
         assert response_delete.status_code == 200
-
         # Make sure file was removed
         response_after_delete = requests.get(f"{api_url}/pdfs/{db_pdf.id}.pdf", headers=header, timeout=20)
         assert response_after_delete.status_code == 404
+
+        # remove pdf database entry
+        response_delete = requests.delete(f"{api_url}/pdfs/{db_pdf.id}", headers=header, timeout=20)
+        assert response_delete.status_code == 200
+        # Make sure entry was removed
         response_after_delete = requests.get(f"{api_url}/pdfs/{db_pdf.id}", headers=header, timeout=20)
         assert response_after_delete.status_code == 404
+
