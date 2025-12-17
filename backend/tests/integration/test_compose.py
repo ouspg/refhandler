@@ -14,9 +14,8 @@ def test_frontend_reachable(docker_services, frontend_url):
     assert response.status_code == 200
 
 
-@pytest.mark.skip("reason=SSLError wrong version number")
-def test_frontend_https_reachable(docker_services, frontend_url_https):
-    response = requests.get(frontend_url_https, verify=False, timeout=20)
+def test_frontend_https_reachable(docker_services, frontend_https_url):
+    response = requests.get(frontend_https_url, verify=False, timeout=20)
     assert response.status_code == 200
 
 

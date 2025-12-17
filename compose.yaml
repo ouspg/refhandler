@@ -4,6 +4,8 @@ services:
     depends_on:
         backend:
           condition: service_healthy
+        clamav-rest:
+          condition: service_healthy
     build:
       context: ./frontend
     env_file: .env
@@ -11,13 +13,12 @@ services:
     - frontend
     ports:
     - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    - ${FRONTEND_HTTPS_PORT}:${FRONTEND_HTTPS_PORT}
     restart: unless-stopped
 
   backend:
     depends_on:
       postgres:
-        condition: service_healthy
-      clamav-rest:
         condition: service_healthy
     build:
       context: ./backend

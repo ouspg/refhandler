@@ -12,6 +12,7 @@ from backend.app.postgres_db import init_db_tables, create_default_admin
 
 BACKEND_PORT = int(os.environ["BACKEND_PORT"])
 FRONTEND_PORT = int(os.environ["FRONTEND_PORT"])
+FRONTEND_HTTPS_PORT = int(os.environ["FRONTEND_HTTPS_PORT"])
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 CORS_ALLOWED_ORIGINS = [
@@ -19,8 +20,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1",
     f"http://localhost:{FRONTEND_PORT}",
     f"http://127.0.0.1:{FRONTEND_PORT}",
-    f"https://localhost:{FRONTEND_PORT}",
-    f"https://127.0.0.1:{FRONTEND_PORT}",
+    f"https://localhost:{FRONTEND_HTTPS_PORT}",
+    f"https://127.0.0.1:{FRONTEND_HTTPS_PORT}",
 ]
 
 EXTRA_ALLOWED_ORIGIN_PORTS = os.environ.get("EXTRA_ALLOWED_ORIGIN_PORTS", "")  # Extra port for Development purpose, comma separated
