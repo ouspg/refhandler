@@ -1,13 +1,14 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
 import logging
+from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi import APIRouter
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.app.api.routes import login, users, pdfs
-from backend.app.postgres_db import init_db, create_default_admin
+from backend.app.postgres_db import init_db_tables, create_default_admin
 
 BACKEND_PORT = int(os.environ["BACKEND_PORT"])
 FRONTEND_PORT = int(os.environ["FRONTEND_PORT"])
@@ -18,6 +19,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1",
     f"http://localhost:{FRONTEND_PORT}",
     f"http://127.0.0.1:{FRONTEND_PORT}",
+    f"https://localhost:{FRONTEND_PORT}",
+    f"https://127.0.0.1:{FRONTEND_PORT}",
 ]
 
 EXTRA_ALLOWED_ORIGIN_PORTS = os.environ.get("EXTRA_ALLOWED_ORIGIN_PORTS", "")  # Extra port for Development purpose, comma separated
@@ -47,16 +50,24 @@ class EndpointFilter(logging.Filter):
 logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db_tables()
+    create_default_admin()
+    yield
+
 # Initialize app and include api router with /api prefix
 if ENVIRONMENT == "production":
     # Disables Swagger UI
-    app = FastAPI(docs_url=None,
+    app = FastAPI( lifespan=lifespan,
+                docs_url=None,
                 redoc_url=None,
                 openapi_url=None)
 else:
-    app = FastAPI(docs_url='/api/docs',
-                    redoc_url='/api/redoc',
-                    openapi_url='/api/openapi.json')
+    app = FastAPI( lifespan=lifespan,
+                docs_url='/api/docs',
+                redoc_url='/api/redoc',
+                openapi_url='/api/openapi.json')
 
 app.include_router(api_router, prefix="/api")
 
@@ -68,10 +79,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-if __name__ == "__main__":
-    init_db()
-    create_default_admin()
-    # TODO: get mutliple workers working. Integration tests fail 502 bad gateway
-    uvicorn.run("main:app", workers=4, host="0.0.0.0", port=BACKEND_PORT)

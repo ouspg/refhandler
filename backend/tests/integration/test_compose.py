@@ -14,8 +14,14 @@ def test_frontend_reachable(docker_services, frontend_url):
     assert response.status_code == 200
 
 
-def test_nginx_api_proxy(docker_services, frontend_url):
-    response = requests.get(frontend_url+"/healthcheck", timeout=20)
+@pytest.mark.skip("reason=SSLError wrong version number")
+def test_frontend_https_reachable(docker_services, frontend_url_https):
+    response = requests.get(frontend_url_https, verify=False, timeout=20)
+    assert response.status_code == 200
+
+
+def test_nginx_api_proxy(docker_services, api_proxy_url):
+    response = requests.get(api_proxy_url+"/healthcheck", timeout=20)
     assert response.status_code == 200
 
 

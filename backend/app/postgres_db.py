@@ -15,7 +15,7 @@ ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
 
 engine = create_engine(POSTGRES_URL)
 
-def init_db(_engine = engine):
+def init_db_tables(_engine = engine):
     # Initialize database tables using SQLMOdels from /backend/app/models.py
     SQLModel.metadata.create_all(bind=_engine)
 

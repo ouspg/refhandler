@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine
 from sqlmodel.pool import StaticPool
 from backend.app.api.depdendancies import get_session
-from backend.app.postgres_db import init_db
+from backend.app.postgres_db import init_db_tables
 from backend.app.main import app
 
 # Mock database with sqlite in-memory database
@@ -17,7 +17,7 @@ def session_fixture():
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
     )
-    init_db(engine)
+    init_db_tables(engine)
     with Session(engine) as session:
         yield session
 

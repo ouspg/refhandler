@@ -4,13 +4,13 @@ Contains pytest fixtures that are used by integration tests.
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
 import pytest
-from backend.app.postgres_db import POSTGRES_URL
 
 BACKEND_PORT = int(os.environ["BACKEND_PORT"])
 FRONTEND_PORT = int(os.environ["FRONTEND_PORT"])
 POSTGRES_PORT = int(os.environ["POSTGRES_PORT"])
 ADMINER_PORT = int(os.environ["ADMINER_PORT"])
 CLAMAV_PORT = int(os.environ["CLAMAV_PORT"])
+
 
 
 # Overrides docker compose file used by docker_services fixture (default: /tests/docker-compose.yml)
@@ -35,7 +35,11 @@ def frontend_url(docker_ip):
     return f"http://{docker_ip}:{FRONTEND_PORT}"
 
 @pytest.fixture(scope="session")
-def api_url(docker_ip):
+def frontend_url_https(docker_ip):
+    return f"https://{docker_ip}:{FRONTEND_PORT}"
+
+@pytest.fixture(scope="session")
+def api_proxy_url(docker_ip):
     return f"http://{docker_ip}:{FRONTEND_PORT}/api"
 
 @pytest.fixture(scope="session")
