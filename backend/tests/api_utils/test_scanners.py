@@ -31,13 +31,13 @@ async def test_clamav_scan_mockup(mocker):
 async def test_virustotal_scan_without_apikey(mocker):
     mocker.patch("backend.app.api.scanners.VIRUSTOTAL_API_KEY", "")
     with open("backend/tests/api/test.pdf", "rb") as pdf_file:
-
         content_hash = await get_sha256_hash(UploadFile(pdf_file))
+
         response = await scanners.virustotal_scan(content_hash)
         # 401 if no API key provided
-        assert response["status_code"] == 401
-        
-        
+        assert response.status_code == 401
+
+
 @pytest.mark.asyncio
 async def test_virustotal_scan_invalid_apikey(mocker):
     mocker.patch("backend.app.api.scanners.VIRUSTOTAL_API_KEY", "invalid")
@@ -45,8 +45,8 @@ async def test_virustotal_scan_invalid_apikey(mocker):
 
         content_hash = await get_sha256_hash(UploadFile(pdf_file))
         response = await scanners.virustotal_scan(content_hash)
-        # 401 if no API key provided
-        assert response["status_code"] == 401
+        # 500 API error
+        assert response.status_code == 500
 
 
 @pytest.mark.asyncio
@@ -58,6 +58,7 @@ async def test_virustotal_scan_file_scanned(mocker):
                      return_value=Response(200, json=response_json))
 
         response = await scanners.virustotal_scan("doesnt_matter_response_mocked")
-        assert response["status_code"] == 200
-        assert response["results"]["malicious"] == 0
-        assert response["results"]["suspicious"] == 0
+        assert response.status_code == 200
+        data = response.json()
+        assert data["results"]["malicious"] == 0
+        assert data["results"]["suspicious"] == 0

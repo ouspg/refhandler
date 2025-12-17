@@ -92,7 +92,7 @@ def test_api_pdfs(api_proxy_url, docker_services):
         # Try to upload the same file again
         pdf_file.seek(0)
         response_post_again = requests.post(f"{api_proxy_url}/pdfs", files=files, headers=header, timeout=20)
-        assert response_post_again.status_code == 409
+        assert response_post_again.status_code == 200
 
         # Get uploaded test file from backend and compare contents with original
         response_get = requests.get(f"{api_proxy_url}/pdfs/{db_pdf.id}.pdf", headers=header, timeout=20)

@@ -6,7 +6,7 @@ import uuid
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from backend.app.models import UserCreate, UserUpdate, UserRole, UserPublic
+from backend.app.models import UserCreate, UserUpdate, UserRole, UserPublic, User
 from backend.app.api import user_crud
 
 
@@ -59,9 +59,9 @@ def test_update_users_me(client: TestClient, session: Session):
     response = client.patch(
         "/api/users/me", headers=header, json=new_data.model_dump())
     assert response.status_code == 200
-    user = UserPublic.model_validate_json(response.text)
-    assert user.email == new_email
-    assert user.role == UserRole.manager
+    updated_user = UserPublic.model_validate_json(response.text)
+    assert updated_user == UserPublic.model_validate(
+        created_user, update={"email": new_email, "role": UserRole.manager})
     
     # Test changed password by getting a new token
     header = _get_access_token_header(client, new_email, "new_password")

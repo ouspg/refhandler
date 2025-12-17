@@ -11,6 +11,7 @@ import os
 import json
 from sqlmodel import Session, select
 from fastapi import UploadFile
+from httpx import Response
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
 from backend.app.models import Pdf, PdfCreate, PdfUpdate, VirusScanResult
@@ -92,9 +93,11 @@ def get_file_path(pdf_id: uuid.UUID | str) -> str | None:
         return None
 
 
-def create_virus_scan_result(session: Session, scan_results: dict) -> VirusScanResult:
-    scan_results_string = json.dumps(scan_results)
-    db_scan_result = VirusScanResult(scan_results=scan_results_string)
+def create_virus_scan_result(session: Session, scan_results: dict[str, Response]) -> VirusScanResult:
+    scan_results_json = {}
+    for scanner, response in scan_results.items():
+        scan_results_json[scanner] = response.text
+    db_scan_result = VirusScanResult(scan_results=json.dumps(scan_results_json))
     session.add(db_scan_result)
     session.commit()
     session.refresh(db_scan_result)
