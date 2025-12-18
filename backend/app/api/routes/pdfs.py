@@ -91,7 +91,7 @@ async def patch_pdf(session: SessionDep, current_user: CurrentUser,
             raise HTTPException(403, "Only admins can patch other user's files")
 
     if ends_in_dot_pdf(file_id):
-        raise HTTPException(51, "Patching pdf files is not implemented")
+        raise HTTPException(501, "Patching pdf files is not implemented")
     else:
         updated_pdf = pdf_crud.update_pdf(session, db_pdf, pdf_update)
         return updated_pdf
