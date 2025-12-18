@@ -7,6 +7,7 @@ the docker compose stack before running tests. (see conftest.py for details)
 # pylint: disable=missing-function-docstring, unused-argument, unused-import, fixme, unused-variable
 import pytest
 import requests
+import urllib3
 
 
 def test_frontend_reachable(docker_services, frontend_url):
@@ -14,12 +15,15 @@ def test_frontend_reachable(docker_services, frontend_url):
     assert response.status_code == 200
 
 
+# SSL verification is disabled because the frontend cert is self-signed
 def test_frontend_https_reachable(docker_services, frontend_https_url):
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    
     response = requests.get(frontend_https_url, verify=False, timeout=20)
     assert response.status_code == 200
 
 
-def test_nginx_api_proxy(docker_services, api_proxy_url):
+def test_nginx_api_proxy_reachable(docker_services, api_proxy_url):
     response = requests.get(api_proxy_url+"/healthcheck", timeout=20)
     assert response.status_code == 200
 
@@ -29,7 +33,7 @@ def test_adminer_reachable(docker_services, adminer_url):
     assert response.status_code == 200
 
 
-def test_backend_healthcheck(docker_services, backend_url):
+def test_backend_healthcheck_reachable(docker_services, backend_url):
     response = requests.get(backend_url+"/api/healthcheck", timeout=20)
     assert response.status_code == 200
 
