@@ -125,3 +125,13 @@ def test_delete_invalid_id(session: Session, client: TestClient):
 
     response_delete = client.delete(f"api/pdfs/{invalid_id}.pdf", headers=token_header)
     assert response_delete.status_code == 404
+
+#TODO: post pdf without filename
+
+#TODO: patch pdf dont in database
+#TODO: Patch other user's pdf without admin
+#TODO: Patch pdf file, receive http 501
+
+#TODO: delete other user's pdf without admin
+#TODO: delete PDF file not on disk
+

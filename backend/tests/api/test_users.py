@@ -206,3 +206,12 @@ def test_signup(client: TestClient):
     assert response.status_code == 200
     user = UserPublic.model_validate_json(response.text)
     assert user.email == test_email
+
+
+#TODO: delete admin user
+#TODO: delete user not in db
+
+#TODO: Signup user with already used email
+
+#TODO: patch user not in db
+#TODO: patch user with already used email
