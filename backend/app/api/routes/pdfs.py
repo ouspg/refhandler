@@ -60,7 +60,7 @@ async def upload_pdf(session: SessionDep, scanners: ScannersDep,
     scan_results = await scanners.scan(pdf_file, pdf_content_hash)
     scan_results_db = pdf_crud.create_virus_scan_result(session, scan_results)
 
-    # Abort if any scanner found the file dangerous
+    # Abort if any scanner found the file dangerous (responded with HTTP code 406)
     for scanner, scanner_response in scan_results.items():
         if scanner_response.status_code == 406:
             raise HTTPException(406, {"detail": f"{pdf_file.filename} is not safe. ",
@@ -96,7 +96,7 @@ async def patch_pdf(session: SessionDep, current_user: CurrentUser,
         updated_pdf = pdf_crud.update_pdf(session, db_pdf, pdf_update)
         return updated_pdf
 
-# TODO: patch pdf files?
+# TODO: patch pdf files? Would require scanning again
 
 # Delete pdf database object (file_id) or pdf file on disk (file_id.pdf)
 @router.delete("/{file_id}")
@@ -116,7 +116,7 @@ async def delete_pdf(session: SessionDep, current_user: CurrentUser, file_id: st
             raise HTTPException(404, "Pdf file not found on disk")
         # File found, deleting it from disk
         os.remove(file_path)
-        return {"message": f"{db_pdf.original_filename} deleted sucessfully"}
+        return {"message": f"{db_pdf.original_filename} deleted sucessfully from disk"}
     else:
         pdf_crud.delete_pdf(session, db_pdf)
-        return {"message": f"{db_pdf.original_filename} deleted sucessfully"}
+        return {"message": f"{db_pdf.original_filename} deleted sucessfully from the database"}

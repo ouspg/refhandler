@@ -2,8 +2,8 @@
 """
 Dependancies that can be injected into the FastAPI endpoint functions.
 
-SessionDep: Contains database session that API endpoints will use for database operations
-ScannersDep: Contains malware scanners, used by /api/pdfs
+SessionDep: Eatabase session that API endpoints will use for database operations
+ScannersDep: Malware scanners, used by /api/pdfs
 
 OAuth2Dep: For /api/login/access-token credentials form
 TokenDep: For JWT token decoding in get_current_user() 
@@ -38,7 +38,7 @@ ScannersDep = Annotated[Scanners, Depends(Scanners)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 OAuth2Dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
-
+# Decrypts token and returns the User it belongs to, if it was valid
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
     try:
         decoded_token = jwt.decode(
@@ -53,12 +53,12 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         raise HTTPException(404, "User not found")
     return user
 
-
+# Decrypts token and returns the admin User it belongs to, if it was valid
 def get_current_admin(session: SessionDep, token: TokenDep) -> User:
     user = get_current_user(session, token)
 
     if user.role != UserRole.admin:
-        raise HTTPException(403, "Use role isn't admin")
+        raise HTTPException(403, "User role isn't admin")
 
     return user
 

@@ -1,3 +1,12 @@
+"""
+Setup for the main FastAPI application
+- CORS
+- Combine API routes into one router with /api/ prefix
+- Define /healthcheck endpoint and filter it from the logs
+- Define lifespan for the app, used to initialize the database on startup
+- Disable /docs, /redoc and /openapi.json if ENVIRONMENT was set to "production"
+"""
+
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import os
 import logging
@@ -50,14 +59,14 @@ class EndpointFilter(logging.Filter):
         return 'GET /api/healthcheck' not in record.getMessage()
 logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
-
+# Functions in lifespan() are run on app startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db_tables()
     create_default_admin()
     yield
 
-# Initialize app and include api router with /api prefix
+# Initialize app
 if ENVIRONMENT == "production":
     # Disables Swagger UI
     app = FastAPI( lifespan=lifespan,
@@ -70,6 +79,7 @@ else:
                 redoc_url='/api/redoc',
                 openapi_url='/api/openapi.json')
 
+# include api router with /api prefix
 app.include_router(api_router, prefix="/api")
 
 # Set all CORS enabled origins

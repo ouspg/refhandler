@@ -18,10 +18,12 @@ ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 
 def create_user(session: Session, user_create: UserCreate) -> User | None:
+    """Inserts user_create into the database, returns None if user email was already in use"""
     # Skip user creation if email is already in use
     if get_user_by_email(session, user_create.email):
         return None
 
+    # Replace plaintext password with hash and insert User into database
     db_user = User.model_validate(
         user_create, update={
             "hashed_password": get_password_hash(user_create.password)}
@@ -33,11 +35,13 @@ def create_user(session: Session, user_create: UserCreate) -> User | None:
 
 
 def create_default_admin(session: Session) -> User | None:
+    """Inserts default admin User into the database, returns None if already exists"""
     admin_user = UserCreate(role=UserRole.admin, email=ADMIN_EMAIL, password=ADMIN_PASSWORD)
     return create_user(session, admin_user)
 
 
 def update_user(session: Session, target_user: User, user_update: UserUpdate) -> User:
+    """Updates target_user database entry with new values from user_update"""
     new_data = user_update.model_dump(exclude_unset=True)
 
     extra_data = {}
@@ -54,28 +58,38 @@ def update_user(session: Session, target_user: User, user_update: UserUpdate) ->
 
 
 def delete_user(session: Session,  target_user: User):
+    """Deletes target_user from the database"""
     session.delete(target_user)
     session.commit()
 
 
-def get_user_by_id(session: Session, user_id: uuid.UUID | str):
+def get_user_by_id(session: Session, user_id: uuid.UUID | str) -> User | None:
+    """Returns User from database matching user_id, returns None if User wasn't found"""
+
+    # Accept UUID in str format, but convert it to UUID
     try:
         if isinstance(user_id, str):
             user_id = uuid.UUID(user_id)
     except ValueError:
+        # String wasn't a valid UUID
         return None
 
+    # Returns None if User matching user_id wasn't found
     db_user = session.get(User, user_id)
     return db_user
 
 
 def get_user_by_email(session: Session, email: str) -> User | None:
+    """Returns User from database with email, returns None if User wasn't found"""
     user_with_email = select(User).where(User.email == email)
     session_user = session.exec(user_with_email).first()
     return session_user
 
 
 def authenticate_user(session: Session, email: str, password: str) -> User | None:
+    """Returns User from database matching credentials email:password,
+    returns None if User wasnt found or password didn't match stored hash"""
+    
     db_user = get_user_by_email(session, email)
     if not db_user:
         # No user with given email

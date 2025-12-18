@@ -1,4 +1,13 @@
-# pylint: disable=missing-function-docstring, pointless-string-statement, missing-module-docstring, missing-class-docstring, unused-variable, fixme
+"""
+Scanner utility for /api/pdfs
+
+Use scanner.scan(pdf_file) to scan the pdf file using the following scanners:
+- ClamAV-rest docker container
+- Virustotal web API (if VIRUSTOTAL_API_KEY was given in the .env file)
+
+Returns dict[str, Response] with scanner name as key and scanner's response as value
+"""
+# pylint: disable=missing-function-docstring, pointless-string-statement, missing-class-docstring, unused-variable, fixme
 import os
 import hashlib
 import requests
@@ -13,8 +22,6 @@ CLAMAV_SCAN_URL = f"http://clamav-rest:{CLAMAV_PORT}/v2/scan"
 VIRUSTOTAL_MALICIOUS_CUTOFF = int(os.environ["VIRUSTOTAL_MALICIOUS_CUTOFF"])
 VIRUSTOTAL_API_KEY = os.environ["VIRUSTOTAL_API_KEY"]
 VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"
-
-# Class for calling file scanner APIs
 
 
 class Scanners:
@@ -82,7 +89,7 @@ async def get_sha256_hash(file: UploadFile):
     return hashlib.sha256(file_bytes).hexdigest()
 
 """
-Example Virustotal API response
+Example Virustotal API response we want to extract
 
 {
   "malicious": 1,

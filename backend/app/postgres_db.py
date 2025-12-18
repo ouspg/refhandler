@@ -1,3 +1,6 @@
+"""
+Postgres database initialization for main.py
+"""
 # pylint: disable=missing-function-docstring, missing-module-docstring, line-too-long
 import os
 from sqlmodel import SQLModel, create_engine, Session

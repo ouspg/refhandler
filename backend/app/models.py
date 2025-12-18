@@ -27,15 +27,18 @@ import enum
 from sqlmodel import Field, SQLModel, Relationship, Enum, Column
 from pydantic import EmailStr
 
-##############################################
-# WARNING
-# If you make change to SQLModels with table=True,
-# you must delete the postgres database OR
-# generate matching database migration scripts:
-# /backend/README.md#Running database migrations with alembic
-##############################################
+"""
+###########
+# WARNING #
+###########
 
+If you make change to SQLModels with table=True,
+you must delete the postgres database OR
+generate matching database migration scripts:
+/backend/README.md#Running database migrations with alembic
+"""
 
+# TODO: Refactor into table with one scanner result per row
 class VirusScanResult(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     pdf: "Pdf" = Relationship(
@@ -83,7 +86,6 @@ class UserRole(str, enum.Enum):
     user = "user"
 
 
-# Fields shared by User models
 class UserBase(SQLModel):
     firstName: str | None = None
     middleName: str | None = None
@@ -99,18 +101,14 @@ class UserBase(SQLModel):
 class UserCreate(UserBase, use_enum_values=True):
     password: str = Field(min_length=8, max_length=128)
 
-# For updating user information. Make sure all fields can be set to None
-# so you can initialize the model with only the fields you want to update
-class UserUpdate(UserBase):
-    email: EmailStr | None = None
-    password: str | None = Field(default=None, min_length=8, max_length=128)
 
 # User database table. Generates UUID and replaces plaintext password with hash
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
 
-# For returning User objects. Hides fields we don't want to return, such as password hash
+
+# For returning User objects. Hides confidential fields, such as password hash
 class UserPublic(SQLModel):
     id: uuid.UUID
     firstName: str | None
@@ -120,3 +118,10 @@ class UserPublic(SQLModel):
     phone: str | None
     status: str | None
     role: UserRole = Field(sa_column=Column(Enum(UserRole)))
+
+
+# For updating user information. Make sure all fields can be set to None
+# so you can initialize the model with only the fields you want to update
+class UserUpdate(UserBase):
+    email: EmailStr | None = None
+    password: str | None = Field(default=None, min_length=8, max_length=128)
