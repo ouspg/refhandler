@@ -10,16 +10,16 @@ All API endpoints with `current_user: CurrentUser` in their function arguments r
 
 1. Create login JSON payload `{"username": user_email,"password": user_password}`. Note the login credentials are `email:password`, but FastAPI security library uses Oauth2 password flow, which is why the payload key is `username` instead of `email`.
 2. POST the login payload to `/api/login/access-token`
-3. If login credentials are valid, the API generates and sends back a JWT token as a string. Token is valid for 1 week (can be changed in [/backend/app/security.py](/backend/app/security.py)).
+3. If login credentials are valid, the API sends back a JWT token as a string. Token is valid for 1 week (can be changed in [/backend/app/security.py](/backend/app/security.py)).
 4. Add the JWT token to API requests as a header: `Authorization: Bearer <token>`
 
 ### Default admin account
 
-The database is initialized with a default admin account. Credentials available in the [.env](.env) file. (Remember to change the default password before production use).
+The database is initialized with a default admin account. The credentials are defined in the [.env](.env) file. (Remember to change the default password before production use).
 
 ### /api/users
 
-🔒: requires valid access token
+🔒: requires valid access token  
 🛠️: Admin accounts only
 
 - 🔒`GET /api/users/me` Get user information for the **currently authenticated user**
@@ -28,16 +28,17 @@ The database is initialized with a default admin account. Credentials available 
 - 🔒`DELETE /api/users/me` Delete the **currently authenticated user**
 - 🔒🛠️`DELETE /api/users/user_id` Delete the **user with UUID matching `user_id`**. **Admin only.**
 - 🔒`GET /api/users/user_id` Get the user information for **user with UUID matching `user_id`**
-- `POST /api/users/signup` **Register a new user account** by sending a POST request with a JSON payload matching the pydantic model `UserCreate` (see `/backend/app/models.py` for details)
+- `POST /api/users/signup` **Register a new user account** by sending a POST request with a JSON payload matching the SQLModel `UserCreate` (see [/backend/app/models.py](/backend/app/models.py) for details)
 
 ### /api/pdfs
 
-🔒: requires valid access token
+🔒: requires valid access token  
 🛠️: Admin accounts only
 
-- 🔒`POST /api/pdfs/` Accepts POST requests with a **PDF file in the `multipart/form-data` format**. If the file passes malware scanning, it is stored on disk and the API responds with pydantic model `Pdf` of the file (see `/backend/app/models.py` for details).
+- 🔒`POST /api/pdfs/` Accepts POST requests with a **PDF file in `multipart/form-data` format**. If the file passes malware scanning, it is stored on disk and the API responds with the database entry of the file in `PdfPublic` format (see [/backend/app/models.py](/backend/app/models.py) for details).
 - 🔒`GET /api/pdfs/file_id`: Get the **PDF database entry** matching the UUID `file_id`.
 - 🔒`GET /api/pdfs/file_id.pdf`: Get the **PDF file** matching the UUID `file_id` **from disk**.
+- 🔒`PATCH /api/pdfs/file_id`: Update the **PDF database entry** matching the UUID `file_id` by sending JSON payload matching the model `PdfUpdate`. Updating other user's files requires Admin privileges.
 - 🔒`DELETE /api/pdfs/file_id.pdf`: Delete the **PDF file matching the UUID `file_id`** from disk. Deleting other user's files requires Admin privileges.
 - 🔒`DELETE /api/pdfs/file_id`: Delete the **PDF database entry** matching the UUID `file_id`.  Deleting other user's database entries requires Admin privileges.
 
@@ -45,9 +46,9 @@ The database is initialized with a default admin account. Credentials available 
 
 In development mode, in-depth API documentation available in the auto-generated Swagger UI at `/api/docs`.
 
-## Running unit tests
+## Running unit and integration tests
 
-**TODO:** find easier way to run tests without manually installing python 3.12 and py
+**TODO:** find easier way to run tests without manually installing python 3.12
 
 Tests work for at least python versions 3.12 and 3.14
 
@@ -61,7 +62,7 @@ source venv/bin/activate
 # Install required python packages into the virtual environment
 pip install -r backend/requirements-dev.txt
 
-# Run unit tests
+# Run tests
 pytest /backend/tests/
 ```
 
@@ -75,7 +76,7 @@ python -m venv venv
 # Install required python packages into the virtual environment
 pip install -r backend/requirements-dev.txt
 
-# Run unit tests
+# Run tests
 pytest ./backend/tests/
 ```
 
