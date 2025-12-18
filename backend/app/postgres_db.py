@@ -27,3 +27,7 @@ def create_default_admin(_engine = engine):
         # Create default admin account if it doesn't exist yet
         if user_crud.get_user_by_email(session, ADMIN_EMAIL) is None:
             user_crud.create_default_admin(session)
+
+if __name__ == "__main__":
+    init_db_tables(engine)
+    create_default_admin(engine)

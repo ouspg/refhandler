@@ -59,23 +59,15 @@ class EndpointFilter(logging.Filter):
         return 'GET /api/healthcheck' not in record.getMessage()
 logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
-# Functions in lifespan() are run on app startup
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db_tables()
-    create_default_admin()
-    yield
 
 # Initialize app
 if ENVIRONMENT == "production":
     # Disables Swagger UI
-    app = FastAPI( lifespan=lifespan,
-                docs_url=None,
+    app = FastAPI(docs_url=None,
                 redoc_url=None,
                 openapi_url=None)
 else:
-    app = FastAPI( lifespan=lifespan,
-                docs_url='/api/docs',
+    app = FastAPI(docs_url='/api/docs',
                 redoc_url='/api/redoc',
                 openapi_url='/api/openapi.json')
 
