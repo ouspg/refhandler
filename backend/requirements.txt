@@ -1,5 +1,6 @@
 requests
 fastapi
+fastapi[standard]
 uvicorn
 python-multipart
 sqlmodel
@@ -10,3 +11,4 @@ pyjwt
 passlib
 pydantic[email]
 bcrypt==4.3.0
+pdfminer

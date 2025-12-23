@@ -1,0 +1,95 @@
+"""
+Unit tests for backend.app.crud
+"""
+# pylint: disable=invalid-name, missing-function-docstring
+import uuid
+from sqlmodel import Session
+from backend.app.models import UserCreate, UserUpdate, UserRole, User
+from backend.app import security
+from backend.app.api import user_crud
+
+test_email = "foo@bar.com"
+test_password = "foobarbaz"
+test_user = UserCreate(email=test_email, password=test_password)
+
+
+def test_create_user(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
+    assert created_user.email == test_email
+    assert isinstance(created_user.id, uuid.UUID)
+
+    assert security.verify_password(
+        test_password, created_user.hashed_password)
+
+
+def test_update_user(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
+    new_phone = "123456789"
+    new_data = UserUpdate(phone=new_phone)
+
+    updated_user = user_crud.update_user(session, created_user, new_data)
+    assert updated_user == User.model_validate(
+        created_user, update={"phone": new_phone})
+
+
+def test_delete_user(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
+    user_crud.delete_user(session, created_user)
+    assert user_crud.get_user_by_id(session, created_user.id) is None
+
+
+def test_get_user_by_id(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    assert created_user is not None
+    user_by_id = user_crud.get_user_by_id(session, created_user.id)
+    assert user_by_id == created_user
+
+    # Try to get invalid user_id
+    invalid_user_by_id = user_crud.get_user_by_id(session, "foobar")
+    assert invalid_user_by_id is None
+
+
+def test_get_user_by_email(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    user_by_email = user_crud.get_user_by_email(session, test_email)
+
+    assert user_by_email == created_user
+
+
+def test_authenticate_user(session: Session):
+    created_user = user_crud.create_user(session, test_user)
+    authenticated_user = user_crud.authenticate_user(
+        session, test_email, test_password)
+
+    assert authenticated_user is created_user
+
+
+def test_authenticate_user_invalid_email(session: Session):
+    user_crud.create_user(session, test_user)
+    invalid_email = "invalid@bar.com"
+    authenticated_user = user_crud.authenticate_user(
+        session, invalid_email, test_password)
+
+    assert authenticated_user is None
+
+
+def test_authenticate_user_invalid_password(session: Session):
+    user_crud.create_user(session, test_user)
+    invalid_password = "invalid"
+    authenticated_user = user_crud.authenticate_user(
+        session, test_email, invalid_password)
+
+    assert authenticated_user is None
+
+
+def test_create_default_admin(session: Session):
+    admin_user = user_crud.create_default_admin(session)
+    assert admin_user is not None
+    assert admin_user.role == UserRole.admin
+    
+    # Try to create default admin user again
+    second_admin_user = user_crud.create_default_admin(session)
+    assert second_admin_user is None

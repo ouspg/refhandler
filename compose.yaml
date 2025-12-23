@@ -3,7 +3,9 @@ services:
   frontend:
     depends_on:
         backend:
-          condition: service_started
+          condition: service_healthy
+        clamav-rest:
+          condition: service_healthy
     build:
       context: ./frontend
     env_file: .env
@@ -11,44 +13,44 @@ services:
     - frontend
     ports:
     - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    - ${FRONTEND_HTTPS_PORT}:${FRONTEND_HTTPS_PORT}
     restart: unless-stopped
 
   backend:
     depends_on:
       postgres:
         condition: service_healthy
-      clamav-rest:
-        condition: service_healthy
     build:
       context: ./backend
     env_file: .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_SERVER: ${POSTGRES_SERVER}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+    command: >
+      bash -c "python backend/app/postgres_db.py
+      && fastapi run backend/app/main.py --port ${BACKEND_PORT} --workers 4"
+
     networks:
     - frontend
     - backend
     ports:
     - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
-    - pdf_uploads:/pdf_uploads
-    - ./backend/alembic.ini:/app/alembic.ini
-    - ./backend/alembic/:/app/alembic
+    - pdf_uploads:${UPLOAD_DIR}
+    - ./backend/alembic.ini:/src/backend/alembic.ini
+    - ./backend/alembic/:/src/backend/alembic
     post_start:
-    - command: sh -c "alembic upgrade head"
+    - command: sh -c "alembic -c /src/backend/alembic.ini upgrade head"
     restart: unless-stopped
+    healthcheck:
+      test: /usr/bin/curl --fail http://localhost:${BACKEND_PORT}/api/healthcheck || exit 1
+      interval: 30s
+      start_period: 30s
+      start_interval: 5s
+      timeout: 10s
+      retries: 10
 
   postgres:
     build:
       context: ./postgres
     env_file: .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     networks:
     - backend
     ports:
@@ -59,15 +61,16 @@ services:
     post_start:
       - command: sh -c "./dump_database.sh"
     labels:
-      deck-chores.pg-dump.command: sh -c ""./dump_database.sh"
-      deck-chores.pg-dump.interval: daily
+      deck-chores.dump-database.command: sh -c "./dump_database.sh"
+      deck-chores.dump-database.interval: daily
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      retries: 5
+      interval: 30s
       start_period: 30s
+      start_interval: 5s
       timeout: 10s
+      retries: 10
 
 # ClamAV virus scanner with REST API
   clamav-rest:
@@ -77,11 +80,9 @@ services:
     environment:
       MAX_FILE_SIZE: 100M
     networks:
-    #- frontend # Uncomment to curl the api from localhost
     - backend
     ports:
     - ${CLAMAV_PORT}:${CLAMAV_PORT}
-    #- 9443:9443
     volumes:
     - clamav_db:/var/lib/clamav
     - clamav_data:/clamav/data
@@ -89,7 +90,9 @@ services:
     healthcheck:
       test: curl --fail http://localhost:${CLAMAV_PORT} || exit 1
       interval: 30s
-      timeout: 5s
+      start_period: 30s
+      start_interval: 5s
+      timeout: 10s
       retries: 10
 
 

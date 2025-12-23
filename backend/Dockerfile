@@ -1,16 +1,15 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+# Install curl for compose health check
+RUN apt-get update && apt-get install -y curl
 
-#RUN apt-get update && apt-get -y install sqlite3
+WORKDIR /code
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir -r /code/requirements.txt
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/code
 
-COPY ./app /app/app
-#COPY alembic.ini ./
-#COPY /alembic ./alembic
+COPY ./app /code/backend/app
 
-CMD ["python", "app/main.py"]
+CMD ["python", "backend/app/main.py"]
